@@ -4,7 +4,15 @@ import logging
 from enum import Enum
 import threading
 import time
+import datetime
 from collections import deque
+
+AXIS_MAX_LEN = 150
+
+DATATYPES = {
+    'pressure1': int,
+    'pressure2': int,
+}
 
 # notes: 
 # super broken (from old project) but useful starting point
@@ -15,16 +23,23 @@ from collections import deque
 # device.in_waiting and .out_waiting gives num bytes in input and output buffers
 
 class Arduino(threading.Thread):
-    def __init__(self, port='/dev/ttyACM0'):
+    def __init__(self, testing, port='/dev/ttyACM0'):
         super().__init__()
-        #  self.device = serial.Serial(port, baudrate=9600, timeout=5, write_timeout=3)
+        self.testing = testing
+        if not testing:
+            self.device = serial.Serial(port, baudrate=9600, timeout=5, write_timeout=3)
+            self.connect()
         self.logger = logging.Logger('logger')
-        self.val = 1
-        q = deque(maxlen=20)
-        q.append(1)
-        q2 = deque(maxlen=20)
-        q2.append(1)
-        self.data = {'num': q, 'X': q2}
+        #  self.val = 1
+
+        #  pressure1 = deque(maxlen=20)
+
+        self.data = {'pressure1': {'X': deque(maxlen=AXIS_MAX_LEN),'Y': deque(maxlen=AXIS_MAX_LEN)},
+                     'pressure2': {'X': deque(maxlen=AXIS_MAX_LEN),'Y': deque(maxlen=AXIS_MAX_LEN)}}
+
+        self.data_test = {'pressure1': {'range': [0, 999]},\
+                          'pressure2': {'range': [0, 999]}\
+                          }
 
     def connect(self):
         try:
@@ -39,38 +54,48 @@ class Arduino(threading.Thread):
             self.device.close()
 
     def read_without_wrapper_temp(self):
-        # for testing. intending to use read()
-        #  value = self.device.readline(3).decode().rstrip('\n')
-        time.sleep(0.5)
+        if not testing:
+            value = self.device.readline(3).decode().rstrip('\n')
         print(value)
         return value
 
     def decode_assign(self, string):
         print(string.split('='))
         name, val = string.split('=')
-        self.data[name].append(int(val)+1)
-        self.data['X'].append(int(val)+1)
+        self.data[name]['Y'].append(DATATYPES[name](val))
 
+        timestamp = datetime.datetime.now()#.strftime('%X%f')
+        self.data[name]['X'].append(timestamp)
 
     def run(self):
-        #  i=1
-        #  while(True):
-            #  if (self.device.in_waiting):
-                #  i += 1
-                #  if (i > 50):
-                    #  break
-                #  line = self.device.readline().decode().rstrip('\r\n')
-                #  self.decode_assign(line)
-                #  print(line)
+        if not self.testing:
+            while(True):
+                if (self.device.in_waiting):
+                    line = self.device.readline().decode().rstrip('\r\n')
+                    self.decode_assign(line)
+                    print(line)
+        else: # testing
+            test_data_list = [(k,v) for k, v in self.data_test.items()]
         
-        while(True):
-            #  if (self.device.in_waiting):
-                #  i += 1
-                #  if (i > 50):
-                    #  break
-            #  line = self.device.readline().decode().rstrip('\r\n')
-            self.decode_assign(f'num={self.data["num"][-1]}')
-            time.sleep(1)
+            while(True):
+                for item in test_data_list:
+                    name = item[0]
+                    minval = item[1]['range'][0]
+                    maxval = item[1]['range'][1]
+                    try:
+                        last_val = self.data[name]['Y'][-1]
+                    except IndexError:
+                        last_val = self.data_test[name]['range'][0]
+                    
+                    if last_val + 1 > maxval:
+                        next_val = minval
+                    else:
+                        next_val = last_val + 1
+                    #  next_val = minval if last_val+1>maxval else last_val+1
+                    self.decode_assign(f'{name}={next_val}')
+                    time.sleep(0.1)
+
+            #  self.decode_assign(f'num={self.data["num"][-1]}')
             #  print(line)
 
         #  print(self.data)
@@ -132,9 +157,8 @@ def sanitised_input(prompt, type_=None, min_=None, max_=None, range_=None):
             return ui
 
 if __name__ == "__main__":
-    arduino = Arduino()
-    arduino.connect()
+    arduino = Arduino(True)
     arduino.start()
-    print(arduino.is_alive())
+    #  print(arduino.is_alive())
     arduino.join()
-    print(arduino.is_alive())
+    #  print(arduino.is_alive())
