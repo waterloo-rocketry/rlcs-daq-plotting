@@ -3,9 +3,8 @@ from dash.dependencies import Output, Input, State
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly
-import plotly.graph_objs as go
-from collections import deque
 
+from graphs import graphs
 from arduino_interface import Arduino
 import argparse
 
@@ -14,50 +13,65 @@ class App:
         self.arduino = Arduino(testing)
         self.arduino.start()
 
-        self.pressure1 = {'X': self.arduino.data['pressure1']['X'], 'Y': self.arduino.data['pressure1']['Y']}
+        self.app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+        self.app.layout = html.Div([
+             #html.Div([
+            for graph in graphs:
+                html.Div([
+                    html.H3(graph.title),
+                    dcc.Graph(id=graph.name),
+                ], className="graph-container"),
 
-        #  initial_trace = plotly.graph_objs.Scatter(
-            #  x=list(self.pressure1['X']),
-            #  y=list(self.pressure1['Y']),
-            #  name='Scatter',
-            #  mode='lines+markers'
-        #  )
-        
-        self.app = dash.Dash(__name__)
-        self.app.layout = html.Div(
-            [
-                dcc.Graph(id='live-graph'
-                          #  animate=True
-                          #  figure={'data': [],#[initial_trace],
-                                  #  'layout': go.Layout(
-                                      #  xaxis=dict(range=[min(self.pressure1['X']), max(self.pressure1['X'])]),
-                                      #  yaxis=dict(range=[min(self.pressure1['Y']), max(self.pressure1['Y'])]))
-                                  #}
-                          ),
-                dcc.Interval(
-                    id='graph-update',
-                    interval=0.5*1000
-                ),
-            ]
+            dcc.Interval(
+                id='graph-update',
+                interval=0.5*1000
+            )],className="main-container"
         )
 
 
-        @self.app.callback(Output('live-graph', 'figure'),
-                      [Input('graph-update', 'n_intervals')],
-                    [State('live-graph', 'figure')])
-        def update_graph_scatter(n, figure):
-            trace = plotly.graph_objs.Scatter(
-                x=list(self.pressure1['X']),
-                y=list(self.pressure1['Y']),
-                name='Scatter',
-                mode='lines+markers'
-            )
+        @self.app.callback([Output(graph.name, 'figure') for graph in graphs],
+                      [Input('graph-update', 'n_intervals')])
+        def update_graph_scatter(n):
+            new_figs = []
+            for graph in graphs:
+                new_data = graph['graph_type'](
+                    x=list(graph['data']['X']),
+                    y=list(graph['data']['Y']),
+                    name='Scatter',
+                    mode='lines+markers'
+                )
+                new_layout = plotly.graph_objs.Layout(
+                    xaxis=dict(range=[min(graph['data']['X']), max(graph['data']['X'])]),
+                    yaxis=dict(range=[min(graph['data']['Y']), max(graph['data']['Y'])])
+                )
 
-            return {'data': [trace],
-                    'layout': go.Layout(
-                        xaxis=dict(range=[min(self.pressure1['X']), max(self.pressure1['X'])]),
-                        yaxis=dict(range=[min(self.pressure1['Y']), max(self.pressure1['Y'])]))#30]))
-                    }
+                new_figs.append({'data': new_data, 'layout': new_layout})
+
+            return new_figs
+            #  trace1 = plotly.graph_objs.Scatter(
+                #  x=list(self.pressure1['X']),
+                #  y=list(self.pressure1['Y']),
+                #  name='Scatter',
+                #  mode='lines+markers'
+            #  )
+            #  trace2 = plotly.graph_objs.Scatter(
+                #  x=list(self.pressure2['X']),
+                #  y=list(self.pressure2['Y']),
+                #  name='Scatter',
+                #  mode='lines+markers'
+            #  )
+
+            #  return [{'data': [trace1],
+                    #  'layout': go.Layout(
+                        #  xaxis=dict(range=[min(self.pressure1['X']), max(self.pressure1['X'])]),
+                        #  yaxis=dict(range=[min(self.pressure1['Y']), max(self.pressure1['Y'])]))#30]))
+                    #  },
+                    #  {'data': [trace2],
+                    #  'layout': go.Layout(
+                        #  xaxis=dict(range=[min(self.pressure2['X']), max(self.pressure2['X'])]),
+                        #  yaxis=dict(range=[min(self.pressure2['Y']), max(self.pressure2['Y'])]))#30]))
+                    #  }
+                    #  ]
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
