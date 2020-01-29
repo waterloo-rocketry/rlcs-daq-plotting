@@ -59,7 +59,7 @@ class Arduino(threading.Thread):
     def decode_assign(self, string):
         print(string.split('='))
         name, val = string.split('=')
-        self.graphs[name]['data']['Y'].append(DATATYPES[name](val))
+        self.graphs[name]['data']['Y'].append(graphs[name]['type'](val))
 
         timestamp = datetime.datetime.now()#.strftime('%X%f')
         self.graphs[name]['data']['X'].append(timestamp)
@@ -73,7 +73,7 @@ class Arduino(threading.Thread):
                     print(line)
         else: # testing
             while(True):
-                for graph in self.graphs:
+                for name, graph in self.graphs.items():
                     minval = graph['range'][0]
                     maxval = graph['range'][1]
                     try:

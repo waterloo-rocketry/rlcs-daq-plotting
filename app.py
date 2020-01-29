@@ -13,15 +13,15 @@ class App:
         self.arduino = Arduino(testing)
         self.arduino.start()
 
-        self.app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-        self.app.layout = html.Div([
-             #html.Div([
-            for graph in graphs:
+        self.app = dash.Dash(__name__)
+        self.app.layout = html.Div(
+            [
                 html.Div([
-                    html.H3(graph.title),
-                    dcc.Graph(id=graph.name),
-                ], className="graph-container"),
-
+                html.H3(graph['title']),
+                dcc.Graph(id=name),
+                ], className="graph-container")
+                for name, graph in graphs.items()
+            ]+[
             dcc.Interval(
                 id='graph-update',
                 interval=0.5*1000
@@ -29,12 +29,12 @@ class App:
         )
 
 
-        @self.app.callback([Output(graph.name, 'figure') for graph in graphs],
+        @self.app.callback([Output('pressure1', 'figure'), Output('pressure2', 'figure')],#[Output(name, 'figure') for name, graph in graphs.items()],
                       [Input('graph-update', 'n_intervals')])
         def update_graph_scatter(n):
             new_figs = []
-            for graph in graphs:
-                new_data = graph['graph_type'](
+            for name, graph in graphs.items():
+                new_data = plotly.graph_objs.Scatter(#graph['graph_type'](
                     x=list(graph['data']['X']),
                     y=list(graph['data']['Y']),
                     name='Scatter',
@@ -46,6 +46,8 @@ class App:
                 )
 
                 new_figs.append({'data': new_data, 'layout': new_layout})
+
+            print(new_figs)
 
             return new_figs
             #  trace1 = plotly.graph_objs.Scatter(
