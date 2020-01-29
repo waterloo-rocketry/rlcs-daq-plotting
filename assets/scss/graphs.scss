@@ -1,0 +1,8 @@
+div.main-container{
+  display: flex;
+  flex-flow: row wrap;
+    div.graph-container{
+      display: flex;
+      flex-flow: column nowrap;
+    }
+}
