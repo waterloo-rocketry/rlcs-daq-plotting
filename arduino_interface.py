@@ -6,10 +6,6 @@ import threading
 import time
 import datetime
 from graphs import graphs
-from collections import deque
-
-AXIS_MAX_LEN = 150
-
 # notes: 
 # super broken (from old project) but useful starting point
 # listing ports: python -m serial.tools.list_ports will print a list of available ports. It is also possible to add a regexp as first argument and the list will only include entries that matched.
@@ -26,17 +22,8 @@ class Arduino(threading.Thread):
             self.device = serial.Serial(port, baudrate=9600, timeout=5, write_timeout=3)
             self.connect()
         self.logger = logging.Logger('logger')
-        #  self.val = 1
 
-        #  pressure1 = deque(maxlen=20)
         self.graphs = graphs
-
-        #  self.data = {'pressure1': {'X': deque(maxlen=AXIS_MAX_LEN),'Y': deque(maxlen=AXIS_MAX_LEN)},
-                     #  'pressure2': {'X': deque(maxlen=AXIS_MAX_LEN),'Y': deque(maxlen=AXIS_MAX_LEN)}}
-
-        #  self.data_test = {'pressure1': {'range': [0, 999]},\
-                          #  'pressure2': {'range': [0, 30]}\
-                          #  }
 
     def connect(self):
         try:
@@ -57,12 +44,16 @@ class Arduino(threading.Thread):
         #  return value
 
     def decode_assign(self, string):
-        print(string.split('='))
-        name, val = string.split('=')
-        self.graphs[name]['data']['Y'].append(graphs[name]['type'](val))
+        try:
+            print(string.split('='))
+            name, val = string.split('=')
+            self.graphs[name]['data']['Y'].append(graphs[name]['type'](val))
 
-        timestamp = datetime.datetime.now()#.strftime('%X%f')
-        self.graphs[name]['data']['X'].append(timestamp)
+            timestamp = datetime.datetime.now()#.strftime('%X%f')
+            self.graphs[name]['data']['X'].append(timestamp)
+        except Exception as e:
+            print(f'error: could not parse serial data:\n {string}')
+
 
     def run(self):
         if not self.testing:
@@ -80,6 +71,8 @@ class Arduino(threading.Thread):
                         last_val = graph['data']['Y'][-1]
                     except IndexError:
                         last_val = graph['range'][0]
+                        
+
                     
                     if last_val + 1 > maxval:
                         next_val = minval
@@ -87,6 +80,8 @@ class Arduino(threading.Thread):
                         next_val = last_val + 1
                     #  next_val = minval if last_val+1>maxval else last_val+1
                     self.decode_assign(f'{name}={next_val}')
+
+                    #  self.decode_assign('aklfakfajfajfaj')
                     time.sleep(0.1)
     
     def serial_out(self, string):
