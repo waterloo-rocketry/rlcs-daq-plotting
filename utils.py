@@ -15,31 +15,21 @@ class LabledEnum(Enum):
         obj.label = label
         return obj
 
-def plot_output_mappings(plots):
-    outputs = []
-    for name, plot in plots.items():
-        if plot['disable']:
-            continue
-        if plot['graph_type'] == go.Scatter:
-            outputs.append(Output(name, 'figure'))
-
-        elif plot['graph_type'] == html.P:
-            if 'state' in name: #TODO janky janky janky please no
-                outputs += [Output(name, 'children'), Output(name, 'className')]
-            else:
-                outputs.append(Output(name, 'children'))
-    return outputs
-
-
 def format_x(queue, settings):
     output_list = []
     for i in list(queue):
         if settings['relative_timestamps']:
             delta = i - datetime.datetime.now()
-            #  print(delta)
-            #  print(delta.total_seconds())
-
             output_list.append(delta.total_seconds())
         else:
             output_list.append(i)
+    #  print(output_list)
     return output_list
+
+def flatten(listy_boi, final=[]):
+    for i in listy_boi:
+        if isinstance(i,list):
+            flatten(i, final)
+        else:
+            final.append(i)
+    return final

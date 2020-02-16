@@ -5,7 +5,10 @@ from enum import Enum
 import threading
 import time
 import datetime
-from plots import plots
+from settings import settings
+
+from dash_data_container import DashData
+
 # notes: 
 # super broken (from old project) but useful starting point
 # listing ports: python -m serial.tools.list_ports will print a list of available ports. It is also possible to add a regexp as first argument and the list will only include entries that matched.
@@ -23,7 +26,7 @@ class Arduino(threading.Thread):
             self.connect()
         self.logger = logging.Logger('logger')
 
-        self.plots = plots
+        self.data = DashData()
 
     def connect(self):
         try:
@@ -37,22 +40,16 @@ class Arduino(threading.Thread):
         if self.device.is_open:
             self.device.close()
 
-    #  def read(self):
-        #  if not testing:
-            #  value = self.device.readline(3).decode().rstrip('\n')
-        #  print(value)
-        #  return value
-
     def decode_assign(self, string):
         try:
-            #  print(string.split('='))
-            name, val = string.split('=')
-            self.plots[name]['data']['Y'].append(plots[name]['type'](val))
+            component_id, val = string.split('=')
+            timestamp = datetime.datetime.now()
+            self.data.update(component_id, val, timestamp)
+            #  plot_dict['data']['Y'].append(plots[name]['type'](val))
 
-            timestamp = datetime.datetime.now()#.strftime('%X%f')
-            self.plots[name]['data']['X'].append(timestamp)
+            #  plot_dict['data']['X'].append(timestamp)
         except Exception as e:
-            print(f'error: could not parse serial data:\n {string}')
+            print(f'error: could not parse serial data:\n {string}\n{e}')
 
 
     def run(self):
@@ -64,23 +61,10 @@ class Arduino(threading.Thread):
                     #  print(line)
         else: # testing
             while(True):
-                for name, plot in self.plots.items():
-                    minval = plot['range'][0]
-                    maxval = plot['range'][1]
-                    try:
-                        last_val = plot['data']['Y'][-1]
-                    except IndexError:
-                        last_val = plot['range'][0]
-                    
-                    if last_val + 1 > maxval:
-                        next_val = minval
-                    else:
-                        next_val = last_val + 1
-                    #  next_val = minval if last_val+1>maxval else last_val+1
-                    self.decode_assign(f'{name}={next_val}')
-
-                    #  self.decode_assign('aklfakfajfajfaj')
-                    time.sleep(0.10)
+                for component_id, component_obj in self.data.mappings.items():
+                    next_val = component_obj.generate_next_test_value()
+                    self.decode_assign(f'{component_id}={next_val}')
+                    time.sleep(1/settings['arduino_hz'])
     
     def serial_out(self, string):
         string += "\n"

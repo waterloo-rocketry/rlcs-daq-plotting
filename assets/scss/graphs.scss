@@ -8,7 +8,7 @@ $fontsize-sectionheader: 19px;
 $fontsize-plottitle: 13px;
 $subtlegrey: #b2b2b2;
 $mediumgrey: #30333d;
-$fontsize-tableitem: 11px;
+$fontsize-tableitem: 14px;
 
 *{
   box-sizing: border-box;
@@ -37,6 +37,7 @@ div.top-row{ // the top half, containing (currently) only pressure and mass sect
   align-items: stretch;
   background-color: yellow;
   margin: $pad 0;
+  flex-grow: 1;
 
   div#pressure-mass-section{
     display: flex;
@@ -81,6 +82,7 @@ div.bot-row{
   justify-content: stretch;
   align-items: stretch;
   background-color: transparent;
+  flex-grow: 1;
 
   div#ignition-currents-section{
     // flex-grow: 2;
@@ -124,12 +126,21 @@ div.bot-row{
     }
   }
 }
+
+div#valves-table{
+  width: 250px;
+}
+
+div#voltages-table{
+  width: 250px;
+}
     
 div.table-main{
   display: flex;
   flex-flow: row nowrap;
   color: $mediumgrey;
   margin: $pad 0-$pad 0 0-$pad;
+  justify-content: stretch;
   flex-grow: 1;
   flex-shrink: 1;
 
@@ -140,34 +151,42 @@ div.table-main{
     font:{
       size: $fontsize-tableitem;
     }
-    color: mix($subtlegrey, $mediumgrey, 30%);
 
     .column-title{
       font: {
+        size: $fontsize-tableitem + 2px;
       }
-      color: mix($subtlegrey, $mediumgrey, 70%);
+      color: mix($subtlegrey, $mediumgrey, 90%);
       margin-bottom: $pad;
     }
 
     .table-item-leftmost{
-      flex-grow: 1;
-      flex-shrink: 1;
-      flex-basis: 0;
+      // flex-grow: 1;
+      // flex-shrink: 1;
+      // flex-basis: 0;
+      // color: mix($subtlegrey, $mediumgrey, 85%);
+      color: mix($subtlegrey, white, 100%);
+      text-align: right;
+      width: max-content;
     }
     
     .table-item{
-      flex-grow: 1;
-      flex-shrink: 1;
-      flex-basis: 0;
+      // flex-grow: 1;
+      // flex-shrink: 1;
+      // flex-basis: 0;
+      margin-bottom: auto;
     }
 
     .table-item-fixed-width{
-      flex-grow: 1;
-      flex-shrink: 1;
-      flex-basis: 0;
+      // flex-grow: 1;
+      // flex-shrink: 1;
+      // flex-basis: 0;
       width: 80px;
     }
   }
+}
+
+#voltages-section{
 }
 
 p{
@@ -179,6 +198,20 @@ p{
         -ms-user-select: none; /* Internet Explorer/Edge */
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Opera and Firefox */
+}
+
+.connectionState-Unknown{
+  color: yellow;
+}
+.connectionState-Illegal{
+  color: white;
+  background-color: red;
+}
+.connectionState-Open{
+  color: #00FF00;
+}
+.connectionState-Closed{
+  color: red;
 }
 
 body{
@@ -213,4 +246,8 @@ h1#main-title{ //main title
   }
   text-align: center;
   background: $mediumgrey;
+}
+
+.dash-debug-menu{
+  top: 10px;
 }

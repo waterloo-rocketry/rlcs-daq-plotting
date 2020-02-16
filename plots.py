@@ -1,4 +1,3 @@
-from collections import deque
 import plotly.graph_objs as go
 import dash_core_components as dcc
 import dash_html_components as html
@@ -60,130 +59,117 @@ Settings ideas:
 -calculate max_len using a variable for time to store
 '''
 
-plots = {
-    'pressure1': {
+pressure_mass_plots = [
+    {
+        'id': 'pressure1',
         'title': 'Fill Tank Pressure',
-        'data':{'X': deque(maxlen=MAX_LEN),'Y': deque(maxlen=MAX_LEN)},
-        'range':[500,505],
-        'type': int,
-        'graph_type': go.Scatter,
+        'range':[0,999],
+        'zero': None,
         'disable': False
     },
-    'pressure2': {
+    {
+        'id': 'pressure2',
         'title': 'Fill Line Pressure',
-        'data':{'X': deque(maxlen=MAX_LEN),'Y': deque(maxlen=MAX_LEN)},
-        'range':[35,52], # usually 0, 999
-        'type': int,
-        'graph_type': go.Scatter,
+        'range':[0,999],
+        'zero': None,
         'disable': False
     },
-    'pressure3': { # used as rocket tank pressure for currents_line
+    {
+        'id': 'pressure3',
         'title': 'Rocket Tank Pressure',
-        'data': {'X': deque(maxlen=MAX_LEN),'Y': deque(maxlen=MAX_LEN)},
-        'range':[0,3], # 999 usually
-        'type': int,
-        'graph_type': go.Scatter,
+        'range':[0,999],
+        'zero': None,
         'disable': False
     },
-    'rocket_mass': {
+    {
+        'id': 'rocket_mass',
         'title': 'Rocket Mass (kg)',
-        'data': {'X': deque(maxlen=MAX_LEN),'Y': deque(maxlen=MAX_LEN)},
-        'range':[0,18], # 180 usually
-        'type': int,
-        'graph_type': go.Scatter,
-        'disable': False
-    },
-    'num_boards_connected': {
-        'title': 'Number of Boards on RocketCAN',
-        'data': {'X': deque(maxlen=MAX_LEN),'Y': deque(maxlen=MAX_LEN)},
-        'range':[0,5],
-        'type': int,
-        'graph_type': go.Scatter,
-        'disable': True
-    },
-    # should be small plots for ign current
-    'ign_pri_current': {
-        'title': 'Ignition Primary Current',
-        'data': {'X': deque(maxlen=MAX_LEN),'Y': deque(maxlen=MAX_LEN)},
-        'range':[0,2],
-        'type': int,
-        'graph_type': go.Scatter,
-        'disable': False
-    },
-    'ign_sec_current': {
-        'title': 'Ignition Secondary Current',
-        'data': {'X': deque(maxlen=MAX_LEN),'Y': deque(maxlen=MAX_LEN)},
-        'range':[0,2],
-        'type': int,
-        'graph_type': go.Scatter,
-        'disable': False
-    },
-    'rlcs_main_batt_mv': {
-        'title': 'RLCS Tower Main Battery Voltage',
-        'data': {'X': deque(maxlen=MAX_LEN),'Y': deque(maxlen=MAX_LEN)},
-        'range':[0,2], #TODO: Update range
-        'type': int,
-        'graph_type': html.P,
-        'disable': False
-    },
-    'rlcs_actuator_batt_mv': {
-        'title': 'RLCS Tower Actuator Voltage',
-        'data': {'X': deque(maxlen=MAX_LEN),'Y': deque(maxlen=MAX_LEN)},
-        'range':[0,2], #TODO: Update range
-        'type': int,
-        'graph_type': html.P,
-        'disable': False
-    },
-    'bus_batt_mv': {
-        'title': 'RocketCAN Bus Battery Voltage',
-        'data': {'X': deque(maxlen=MAX_LEN),'Y': deque(maxlen=MAX_LEN)},
-        'range':[0,2], #TODO: Update range
-        'type': int,
-        'graph_type': html.P,
-        'disable': False
-    },
-    'vent_batt_mv': {
-        'title': 'RocketCAN Vent Battery Voltage',
-        'data': {'X': deque(maxlen=MAX_LEN),'Y': deque(maxlen=MAX_LEN)},
-        'range':[0,2], #TODO: Update range
-        'type': int,
-        'graph_type': html.P,
-        'disable': False
-    },
-    'rfill_valve_state': {
-        'title': 'Remote Fill Valve State',
-        'data': {'X': deque(maxlen=MAX_LEN),'Y': deque(maxlen=MAX_LEN)},
-        # technically range is just integers 1-4, I just use the enum to show what it represents
-        'range':[Connection_State(1).value, Connection_State(4).value],
-        'type': int,
-        'graph_type': html.P, # dcc.Textarea,
-        'disable': False
-    },
-    'rvent_valve_state': {
-        'title': 'Remote Vent Valve State',
-        'data': {'X': deque(maxlen=MAX_LEN),'Y': deque(maxlen=MAX_LEN)},
-        # technically range is just integers 1-4, I just use the enum to show what it represents
-        'range':[Connection_State(1).value, Connection_State(4).value],
-        'type': int,
-        'graph_type': html.P, # dcc.Textarea,
-        'disable': False
-    },
-    'injector_valve_state': {
-        'title': 'Injector Valve State',
-        'data': {'X': deque(maxlen=MAX_LEN),'Y': deque(maxlen=MAX_LEN)},
-        # technically range is just integers 1-4, I just use the enum to show what it represents
-        'range':[Connection_State(1).value, Connection_State(4).value],
-        'type': int,
-        'graph_type': html.P, # dcc.Textarea,
-        'disable': False
-    },
-    'linac_state': {
-        'title': 'Fill Arm Linear Actuator State', #TODO double check that this linac is actually for the fill arm
-        'data': {'X': deque(maxlen=MAX_LEN),'Y': deque(maxlen=MAX_LEN)},
-        # technically range is just integers 1-4, I just use the enum to show what it represents
-        'range':[Connection_State(1).value, Connection_State(4).value],
-        'type': int,
-        'graph_type': html.P, # dcc.Textarea,
+        'range':[0,999],
+        'zero': None,
         'disable': False
     }
-}
+]
+
+current_plots = [
+    {
+        'id': 'ign_pri_current',
+        'title': 'Ignition Primary Current',
+        'range':[0,2000],
+        'zero': None,
+        'disable': False
+    },
+    {
+        'id': 'ign_sec_current',
+        'title': 'Ignition Secondary Current',
+        'range':[0,2000],
+        'zero': None,
+        'disable': False
+    }
+]
+
+valve_states = [
+    {
+        'id': 'rfill_valve_state',
+        'title': 'Remote Fill',
+        # technically range is just integers 1-4, I just use the enum to show what it represents
+        'range':[Connection_State(1).value, Connection_State(4).value],
+        'disable': False
+    },
+    {
+        'id': 'rvent_valve_state',
+        'title': 'Remote Vent',
+        # technically range is just integers 1-4, I just use the enum to show what it represents
+        'range':[Connection_State(1).value, Connection_State(4).value],
+        'disable': False
+    },
+    {
+        'id': 'injector_valve_state',
+        'title': 'Injector',
+        # technically range is just integers 1-4, I just use the enum to show what it represents
+        'range':[Connection_State(1).value, Connection_State(4).value],
+        'disable': False
+    },
+    {
+        'id': 'linac_state',
+        'title': 'Fill Disconnect', #TODO double check that this linac is actually for the fill arm
+        # technically range is just integers 1-4, I just use the enum to show what it represents
+        'range':[Connection_State(1).value, Connection_State(4).value],
+        'disable': False
+    }
+]
+
+voltages = [
+    {
+        'id': 'rlcs_main_batt_mv',
+        'title': 'RLCS Tower Main Bat.',
+        'range':[0,2000],
+        'disable': False
+    },
+    {
+        'id': 'rlcs_actuator_batt_mv',
+        'title': 'RLCS Tower Actuator',
+        'range':[0,2000],
+        'disable': False
+    },
+    {
+        'id': 'bus_batt_mv',
+        'title': 'RocketCAN Bus Bat.',
+        'range':[0,2000],
+        'disable': False
+    },
+    {
+        'id': 'vent_batt_mv',
+        'title': 'RocketCAN Vent Bat.',
+        'range':[0,2000],
+        'disable': False
+    }
+]
+
+#  misc_dash_items = {
+    #  {
+        #  'id': 'num_boards_connected',
+        #  'title': 'Number of Boards on RocketCAN',
+        #  'range':[0,5],
+        #  'disable': True
+    #  }
+#  }

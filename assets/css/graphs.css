@@ -24,7 +24,8 @@ div.top-row {
   justify-content: stretch;
   align-items: stretch;
   background-color: yellow;
-  margin: 10px 0; }
+  margin: 10px 0;
+  flex-grow: 1; }
   div.top-row div#pressure-mass-section {
     display: flex;
     flex-flow: column nowrap;
@@ -54,7 +55,8 @@ div.bot-row {
   margin: 10px -10px;
   justify-content: stretch;
   align-items: stretch;
-  background-color: transparent; }
+  background-color: transparent;
+  flex-grow: 1; }
   div.bot-row div.section {
     display: flex;
     flex-flow: column nowrap;
@@ -86,34 +88,36 @@ div.bot-row {
           flex-grow: 1;
           flex-shrink: 1; }
 
+div#valves-table {
+  width: 250px; }
+
+div#voltages-table {
+  width: 250px; }
+
 div.table-main {
   display: flex;
   flex-flow: row nowrap;
   color: #30333d;
   margin: 10px -10px 0 -10px;
+  justify-content: stretch;
   flex-grow: 1;
   flex-shrink: 1; }
   div.table-main div.table-column {
     display: flex;
     flex-flow: column nowrap;
     margin: 0 10px;
-    font-size: 11px;
-    color: #575960; }
+    font-size: 14px; }
     div.table-main div.table-column .column-title {
-      color: #8b8c8f;
+      font-size: 16px;
+      color: #a5a5a6;
       margin-bottom: 10px; }
     div.table-main div.table-column .table-item-leftmost {
-      flex-grow: 1;
-      flex-shrink: 1;
-      flex-basis: 0; }
+      color: #b2b2b2;
+      text-align: right;
+      width: max-content; }
     div.table-main div.table-column .table-item {
-      flex-grow: 1;
-      flex-shrink: 1;
-      flex-basis: 0; }
+      margin-bottom: auto; }
     div.table-main div.table-column .table-item-fixed-width {
-      flex-grow: 1;
-      flex-shrink: 1;
-      flex-basis: 0;
       width: 80px; }
 
 p {
@@ -131,6 +135,19 @@ p {
   user-select: none;
   /* Non-prefixed version, currently
      supported by Chrome, Opera and Firefox */ }
+
+.connectionState-Unknown {
+  color: yellow; }
+
+.connectionState-Illegal {
+  color: white;
+  background-color: red; }
+
+.connectionState-Open {
+  color: #00FF00; }
+
+.connectionState-Closed {
+  color: red; }
 
 body {
   margin: 0; }
@@ -157,5 +174,8 @@ h1#main-title {
   font-size: 13px;
   text-align: center;
   background: #30333d; }
+
+.dash-debug-menu {
+  top: 10px; }
 
 /*# sourceMappingURL=graphs.css.map */

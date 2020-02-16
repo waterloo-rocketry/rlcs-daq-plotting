@@ -4,12 +4,11 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly
 from plotly import graph_objs as go
-from plots import plots
 from arduino_interface import Arduino
 from plots import Connection_State
 import argparse
 
-from utils import plot_output_mappings, format_x
+from utils import format_x, flatten
 from settings import settings
 
 
@@ -21,118 +20,134 @@ class App:
         self.settings = settings
         self.arduino = Arduino(testing)
         self.arduino.start()
+        self.data = self.arduino.data
 
         self.app = dash.Dash(__name__)
         self.app.config['suppress_callback_exceptions'] = True
         self.app.layout = html.Div([
             build_title(),
-            build_top_row(),
-            build_bot_row(),
+            build_top_row(self.data),
+            build_bot_row(self.data),
             dcc.Interval(
                 id='graph-update',
-                interval=1*1000
+                interval=(1/settings['dashboard_hz'])*1000
             )
         ], className="main")
 
 
-        @self.app.callback(plot_output_mappings(plots),
+        @self.app.callback([plot.get_mapped_output() for plot in self.data.plots],
                       [Input('graph-update', 'n_intervals')])
-        def update_graphs(n):
+        def update_plots(n):
             new_figs = []
-            for name, plot in plots.items():
-                if plot['disable']:
-                    continue
-                if plot['graph_type'] == go.Scatter:
-                    new_data = go.Scatter(
-                        x=format_x(plot['data']['X'], self.settings),
-                        y=list(plot['data']['Y']),
-                        name='Scatter',
-                        mode='lines+markers'
-                    )
-                    if self.settings['autorange'] and plot['data']['X']:
-                        xrange = [min(plot['data']['X']), max(plot['data']['X'])]
-                    else:
-                        xrange = self.settings['range']
+            for plot in self.data.plots:
+                formatted_y = plot.get_y_list()
+                new_data = go.Scatter(
+                    x=format_x(plot.data['X'], self.settings),
+                    y=formatted_y,
+                    name='Scatter',
+                    mode='lines+markers'
+                )
+                if self.settings['autorange'] and plot.data['X']:
+                    xrange = [min(plot.data['X']), max(plot.data['X'])]
+                else:
+                    xrange = self.settings['range']
 
-                    new_layout = plotly.graph_objs.Layout(
-                        xaxis=dict(range=xrange,
-                                    #  tickformat='%X' if not self.settings['relative_timestamps'] else '-',
-                                   showticklabels=self.settings['show_timestamps'],
-                                   #  domain=(-5,0)
-                                  ),
-                        yaxis=dict(range=[min(plot['data']['Y']), max(plot['data']['Y'])],
-                                   tickfont=dict(family='Open Sans', color=f'{subtle_grey}', size=10),
-                                   nticks=4
-                                   ),
-                            
-                        #  autosize=True,
-                        #  height=200,
-                        #  width=400,
-                        # l r b t control the gap between the edge of the plot-container and the plot itself
-                        # margin, padding
-                        margin={
-                            'l': 40,
-                            'r': 30,
-                            'b': 30,
-                            't': 5,
-                            'pad': 0
-                        },
-                        plot_bgcolor = plotbg_grey,
-                        paper_bgcolor = plotbg_grey
-                    )
+                if formatted_y:
+                    yrange = [min(formatted_y), max(formatted_y)]
+                else:
+                    yrange = plot.range
 
-                    new_figs.append({'data': [new_data], 'layout': new_layout})
-                
-                elif plot['graph_type'] == html.P:
-                    if 'state' in name:
-                        if plot['data']['Y']:
-                            current_value_enum = Connection_State(plot['data']['Y'][-1])
-                            new_value = current_value_enum.label
-                        else:
-                            new_value = Connection_State.UNKNOWN.label
-                        new_className = 'connectionState '+new_value
-                        new_figs.append(new_value)
-                        new_figs.append(new_className)
-                    else: # super janky TODO lil refactor
-                        print(name)
-                        try:
-                            new_value = plot['data']['Y'][-1]
-                        except IndexError:
-                            new_value = None
+                new_layout = go.Layout(
+                    xaxis=dict(range=xrange,
+                                #  tickformat='%X' if not self.settings['relative_timestamps'] else '-',
+                               showticklabels=self.settings['show_timestamps'],
+                               #  domain=(-5,0)
+                              ),
+                    yaxis=dict(range=yrange,
+                               tickfont=dict(family='Open Sans', color=f'{subtle_grey}', size=10),
+                               nticks=4
+                               ),
+                        
+                    #  autosize=True,
+                    #  height=200,
+                    #  width=400,
+                    # l r b t control the gap between the edge of the plot-container and the plot itself
+                    # margin, padding
+                    margin={
+                        'l': 40,
+                        'r': 30,
+                        'b': 30,
+                        't': 5,
+                        'pad': 0
+                    },
+                    plot_bgcolor = plotbg_grey,
+                    paper_bgcolor = plotbg_grey
+                )
 
-                        new_figs.append(new_value)
+                new_figs.append({'data': [new_data], 'layout': new_layout})
             return new_figs
+
+        @self.app.callback([voltage.get_mapped_output() for voltage in self.data.voltages],
+                      [Input('graph-update', 'n_intervals')])
+        def update_voltages(n):
+            new_values = []
+            for voltage_component in self.data.voltages:
+                new_value = voltage_component.get_y_formatted()
+                new_values.append(new_value)
+            return new_values
+
+        @self.app.callback(flatten([valve.get_mapped_output() for valve in self.data.valve_states]),
+                      [Input('graph-update', 'n_intervals')])
+        def update_valves(n):
+            updates = []
+            for valve_component in self.data.valve_states:
+                if valve_component.data['Y']:
+                    current_value_enum = Connection_State(valve_component.data['Y'][-1])
+                    new_value = current_value_enum.label
+                else:
+                    new_value = Connection_State.UNKNOWN.label
+                new_className = 'table-item-fixed-width table-item connectionState-'+new_value
+                updates.append(new_value)
+                updates.append(new_className)
+            return updates
 
 def section_header_generator(name):
     header = html.H3(name, className='section-header')
     return header
 
+# Generates the plots in a section
 def section_plots_generator(plots, className='', id=''):
     section_plots = []
     config={'displayModeBar': False}
-    for name, plot in plots.items():
-        if not plot['disable']:
-            new_plot_div = html.Div([
-                html.H3(plot['title'], className='plot-title'),
-                dcc.Graph(id=name, config=config) if plot['graph_type'] == go.Scatter else plot['graph_type'](id=name)
-            ], className="graph-container")
-            section_plots.append(new_plot_div)
+    for plot in plots:
+        new_plot_div = html.Div([
+            html.H3(plot.title, className='plot-title'),
+            dcc.Graph(id=plot.id, config=config)# if plot.graph_type'] == go.Scatter else plot['graph_type(id=name)
+        ], className="graph-container")
+        section_plots.append(new_plot_div)
     section_plots_div = html.Div(section_plots, className=f'section-plots {className}')
     return section_plots_div
 
-def table_section_generator(name, id, plots, column_titles, column_className='table-column', column_title_className='column-title', item_className='table-item', leftmost_item_className='table-item', table_className='table-main', table_id=''):
+def table_section_generator(name, id, plots, column_titles, column_className='table-column', column_title_className='column-title', item_className='table-item', leftmost_item_className='table-item-leftmost', table_className='table-main', table_id=''):
     # rows should be ["name", element_id_col1, element_id_col2, ...]
-        
-    items_in_first_col = [html.P(column_titles[0], className=column_title_className)]
+    
+    if settings['disable_table_column_titles']:
+        items_in_first_col = []
+    else:
+        items_in_first_col = [html.P(column_titles[0], className=column_title_className)]
 
-    for plot in plots.values():
-        items_in_first_col.append(html.P(plot['title'], className=leftmost_item_className))
+    for plot in plots:
+        items_in_first_col.append(html.P(plot.title, className=f'{item_className} {leftmost_item_className}'))
     first_col = html.Div(items_in_first_col, className=column_className)
     
-    items_in_2nd_column = [html.P(column_titles[1], className=column_title_className)]
+    if settings['disable_table_column_titles']:
 
-    for plot_id in plots.keys():
-        items_in_2nd_column.append(html.P('', className=item_className, id=plot_id))
+        items_in_2nd_column = []
+    else:
+        items_in_2nd_column = [html.P(column_titles[1], className=column_title_className)]
+
+    for plot in plots:
+        items_in_2nd_column.append(html.P('', className=item_className, id=plot.id))
     
     second_col = html.Div(items_in_2nd_column, className=column_className)
     
@@ -142,51 +157,45 @@ def table_section_generator(name, id, plots, column_titles, column_className='ta
     section_div = html.Div([section_header_div, table_div], className='section', id=id)
     return section_div
 
+# Generates a section composed of plots
 def plot_section_generator(name, id, plots, className='section', plots_className='', plots_id=''):
     elements = []
     elements.append(section_header_generator(name))
     elements.append(section_plots_generator(plots, plots_className, plots_id))
     return html.Div(elements, className=f'{className}', id=id)
 
-def plots_subset_helper(keys):
-    return dict((k, plots[k]) for k in keys if k in plots)
+def build_pressure_mass_section(data):
+    return plot_section_generator('Pressure and Mass', 'pressure-mass-section', data.plots_pressure_mass)
 
-def build_pressure_mass_section():
-    section_plots = plots_subset_helper(['pressure1', 'pressure2', 'pressure3', 'rocket_mass'])
-    return plot_section_generator('Pressure and Mass', 'pressure-mass-section', section_plots)
-
-def build_voltages_section():
+def build_voltages_section(data):
     # I walked onto the google campus and just ooh im wet splooshin everywhere
-    section_plots = plots_subset_helper(['rlcs_main_batt_mv', 'rlcs_actuator_batt_mv', 'bus_batt_mv', 'vent_batt_mv'])
     return table_section_generator('Voltages',
                                    'voltages-section',
-                                   section_plots,
-                                   ['Name', 'Value'])
+                                   data.voltages,
+                                   ['Name', 'Value'],
+                                   table_id='voltages-table')
 
 
-def build_ignition_currents_section():
-    section_plots = plots_subset_helper(['ign_pri_current','ign_sec_current'])
-    return plot_section_generator('Ignition Currents', 'ignition-currents-section', section_plots)
+def build_ignition_currents_section(data):
+    return plot_section_generator('Ignition Currents', 'ignition-currents-section', data.plots_currents)
 
-def build_valves_section():
-    section_plots = plots_subset_helper(['rvent_valve_state', 'injector_valve_state', 'rfill_valve_state', 'linac_state'])
+def build_valves_section(data):
     return table_section_generator('Valves',
                                    'valves-section',
-                                   section_plots,
+                                   data.valve_states,
                                    ['Name', 'Value'],
-                                   item_className='table-item table-item-fixed-width')
+                                   item_className='table-item',
+                                   table_id='valves-table')
 
-def build_top_row():
-    row_div = html.Div([build_pressure_mass_section()], className='top-row')
-    #  return row_div
+def build_top_row(data):
+    row_div = html.Div([build_pressure_mass_section(data)], className='top-row')
     return row_div
-    #  return build_pressure_mass_section()
 
-def build_bot_row():
+def build_bot_row(data):
     sections = []
-    sections.append(build_ignition_currents_section())
-    sections.append(build_valves_section())
-    sections.append(build_voltages_section())
+    sections.append(build_ignition_currents_section(data))
+    sections.append(build_valves_section(data))
+    sections.append(build_voltages_section(data))
     row_div = html.Div(sections, className='bot-row')
     return row_div
 
@@ -200,4 +209,6 @@ if __name__ == "__main__":
     parser.add_argument('--testing', action='store_true')
     args = parser.parse_args()
     app = App(args.testing)
-    app.app.run_server(debug=True)
+    app.app.run_server(
+        debug=True
+    )
