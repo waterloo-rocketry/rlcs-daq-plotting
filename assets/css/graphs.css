@@ -1,8 +1,161 @@
-div.main-container {
+* {
+  box-sizing: border-box;
+  font-family: "Open Sans", sans-serif;
+  margin: 0;
+  padding: 0; }
+
+div.main {
+  background-color: #1e2130;
+  padding: 10px;
+  margin: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   display: flex;
-  flex-flow: row wrap; }
-  div.main-container div.graph-container {
+  flex-flow: column nowrap;
+  align-items: stretch;
+  overflow: hidden; }
+
+div.top-row {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: stretch;
+  align-items: stretch;
+  background-color: yellow;
+  margin: 10px 0; }
+  div.top-row div#pressure-mass-section {
     display: flex;
-    flex-flow: column nowrap; }
+    flex-flow: column nowrap;
+    flex-grow: 1;
+    background-color: #161a28;
+    padding: 10px;
+    margin: 0; }
+    div.top-row div#pressure-mass-section div.section-plots {
+      display: flex;
+      flex-flow: row nowrap;
+      margin: 0 -5px; }
+      div.top-row div#pressure-mass-section div.section-plots div.graph-container {
+        display: flex;
+        flex-flow: column nowrap;
+        background-color: transparent;
+        margin: 10px 5px 0 5px;
+        flex-grow: 1;
+        flex-basis: 0; }
+        div.top-row div#pressure-mass-section div.section-plots div.graph-container .dash-graph {
+          background-color: red;
+          width: 100%;
+          height: 200px; }
+
+div.bot-row {
+  display: flex;
+  flex-flow: row nowrap;
+  margin: 10px -10px;
+  justify-content: stretch;
+  align-items: stretch;
+  background-color: transparent; }
+  div.bot-row div.section {
+    display: flex;
+    flex-flow: column nowrap;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+    align-items: stretch;
+    background-color: #161a28;
+    padding: 10px;
+    margin: 0 10px; }
+    div.bot-row div.section div.section-plots {
+      display: flex;
+      flex-flow: row nowrap;
+      margin: 0 -5px;
+      flex-grow: 1;
+      flex-shrink: 1;
+      flex-basis: auto; }
+      div.bot-row div.section div.section-plots div.graph-container {
+        display: flex;
+        flex-flow: column nowrap;
+        background-color: transparent;
+        margin: 10px 5px 0 5px;
+        flex-grow: 1;
+        flex-shrink: 1;
+        flex-basis: 0; }
+        div.bot-row div.section div.section-plots div.graph-container .dash-graph {
+          width: 100%;
+          height: 150px;
+          flex-grow: 1;
+          flex-shrink: 1; }
+
+div.table-main {
+  display: flex;
+  flex-flow: row nowrap;
+  color: #30333d;
+  margin: 10px -10px 0 -10px;
+  flex-grow: 1;
+  flex-shrink: 1; }
+  div.table-main div.table-column {
+    display: flex;
+    flex-flow: column nowrap;
+    margin: 0 10px;
+    font-size: 11px;
+    color: #575960; }
+    div.table-main div.table-column .column-title {
+      color: #8b8c8f;
+      margin-bottom: 10px; }
+    div.table-main div.table-column .table-item-leftmost {
+      flex-grow: 1;
+      flex-shrink: 1;
+      flex-basis: 0; }
+    div.table-main div.table-column .table-item {
+      flex-grow: 1;
+      flex-shrink: 1;
+      flex-basis: 0; }
+    div.table-main div.table-column .table-item-fixed-width {
+      flex-grow: 1;
+      flex-shrink: 1;
+      flex-basis: 0;
+      width: 80px; }
+
+p {
+  cursor: default;
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Old versions of Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+     supported by Chrome, Opera and Firefox */ }
+
+body {
+  margin: 0; }
+
+h1#main-title {
+  margin: 0;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 300;
+  color: #f3f5f4; }
+
+.section-header {
+  margin: 0;
+  color: #f3f5f4;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 300;
+  font-size: 19px; }
+
+.plot-title {
+  margin: 0;
+  padding: 5px 0;
+  color: #f3f5f4;
+  font-weight: 300;
+  font-family: "Open Sans", sans-serif;
+  font-size: 13px;
+  text-align: center;
+  background: #30333d; }
 
 /*# sourceMappingURL=graphs.css.map */

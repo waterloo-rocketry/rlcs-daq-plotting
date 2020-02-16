@@ -1,19 +1,216 @@
-div.main-container{
+$pad: 10px;
+$font-family: "Open Sans", sans-serif;
+$bgcolor-main: #1e2130;
+// $bgcolor-lighter: lighten($bgcolor-main, 10%);
+$bgcolor-darker: #161a28;
+$fontcolor-title-offwhite: #f3f5f4;
+$fontsize-sectionheader: 19px;
+$fontsize-plottitle: 13px;
+$subtlegrey: #b2b2b2;
+$mediumgrey: #30333d;
+$fontsize-tableitem: 11px;
+
+*{
+  box-sizing: border-box;
+  font-family: $font-family;
+  margin: 0;
+  padding: 0;
+}
+
+div.main{
+  background-color: $bgcolor-main; //green;
+  padding: $pad;
+  margin: 0;
+  //height: 100vh;
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
   display: flex;
-  flex-flow: row wrap;
-  // justify-content: flex-start;
-  div.graph-container{
+  flex-flow: column nowrap;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+
+div.top-row{ // the top half, containing (currently) only pressure and mass section
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: stretch;
+  align-items: stretch;
+  background-color: yellow;
+  margin: $pad 0;
+
+  div#pressure-mass-section{
     display: flex;
     flex-flow: column nowrap;
-    // width: 200px;
-    // height: 300px;
-    .dash-graph{
-      // height: 200px;
-      // width: 200px;
+    flex-grow: 1;
+    background-color: $bgcolor-darker;
+    padding: $pad;
+    margin: 0;
+
+    div.section-plots{
+      display: flex;
+      flex-flow: row nowrap;
+      margin: 0 0-$pad/2;
+      
+      div.graph-container{
+        display: flex;
+        flex-flow: column nowrap;
+        background-color: transparent;
+        margin: $pad $pad/2 0 $pad/2;
+        flex-grow: 1;
+        flex-basis: 0;
+        // align-items: stretch;
+
+        .dash-graph{
+          background-color: red;
+          width: 100%;
+          // flex-grow: 1;
+          // flex-shrink: 0;
+          // flex-basis: 200px;
+          // min-width: 200px;
+          height: 200px;
+        }
+      }
     }
   }
 }
 
-h3{
-  // text-align: center;
+div.bot-row{
+  display: flex;
+  flex-flow: row nowrap;
+  margin: $pad 0-$pad;
+  justify-content: stretch;
+  align-items: stretch;
+  background-color: transparent;
+
+  div#ignition-currents-section{
+    // flex-grow: 2;
+  }
+
+  div.section{
+    display: flex;
+    flex-flow: column nowrap;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+    align-items: stretch;
+    background-color: $bgcolor-darker;
+    padding: $pad;
+    margin: 0 $pad;
+
+    div.section-plots{
+      display: flex;
+      flex-flow: row nowrap;
+      margin: 0 0-$pad/2;
+      flex-grow: 1;
+      flex-shrink: 1;
+      flex-basis: auto;
+      
+      div.graph-container{
+        display: flex;
+        flex-flow: column nowrap;
+        background-color: transparent;
+        margin: $pad $pad/2 0 $pad/2;
+        flex-grow: 1;
+        flex-shrink: 1;
+        flex-basis: 0;
+
+        .dash-graph{
+          width: 100%;
+          height: 150px;
+          flex-grow: 1;
+          flex-shrink: 1;
+        }
+      }
+    }
+  }
+}
+    
+div.table-main{
+  display: flex;
+  flex-flow: row nowrap;
+  color: $mediumgrey;
+  margin: $pad 0-$pad 0 0-$pad;
+  flex-grow: 1;
+  flex-shrink: 1;
+
+  div.table-column{
+    display: flex;
+    flex-flow: column nowrap;
+    margin: 0 $pad;
+    font:{
+      size: $fontsize-tableitem;
+    }
+    color: mix($subtlegrey, $mediumgrey, 30%);
+
+    .column-title{
+      font: {
+      }
+      color: mix($subtlegrey, $mediumgrey, 70%);
+      margin-bottom: $pad;
+    }
+
+    .table-item-leftmost{
+      flex-grow: 1;
+      flex-shrink: 1;
+      flex-basis: 0;
+    }
+    
+    .table-item{
+      flex-grow: 1;
+      flex-shrink: 1;
+      flex-basis: 0;
+    }
+
+    .table-item-fixed-width{
+      flex-grow: 1;
+      flex-shrink: 1;
+      flex-basis: 0;
+      width: 80px;
+    }
+  }
+}
+
+p{
+  cursor: default;
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Opera and Firefox */
+}
+
+body{
+  margin: 0;
+}
+
+h1#main-title{ //main title
+  margin: 0;
+  font-family: $font-family;
+  font-weight: 300;
+  color: $fontcolor-title-offwhite;
+}
+
+.section-header{
+  margin: 0;
+  color: $fontcolor-title-offwhite;
+  font: {
+    family: $font-family;
+    weight: 300;
+    size: $fontsize-sectionheader;
+  }
+}
+
+.plot-title{
+  margin: 0;
+  padding: $pad/2 0;
+  color: $fontcolor-title-offwhite;
+  font: {
+    weight: 300;
+    family: $font-family;
+    size: $fontsize-plottitle;
+  }
+  text-align: center;
+  background: $mediumgrey;
 }
