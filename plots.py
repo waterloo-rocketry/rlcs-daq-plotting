@@ -141,7 +141,7 @@ valve_states = [
 voltages = [
     {
         'id': 'rlcs_main_batt_mv',
-        'title': 'RLCS Tower Main Bat.',
+        'title': 'RLCS Tower Main',
         'range':[0,2000],
         'disable': False
     },
@@ -153,13 +153,13 @@ voltages = [
     },
     {
         'id': 'bus_batt_mv',
-        'title': 'RocketCAN Bus Bat.',
+        'title': 'RocketCAN Bus',
         'range':[0,2000],
         'disable': False
     },
     {
         'id': 'vent_batt_mv',
-        'title': 'RocketCAN Vent Bat.',
+        'title': 'RocketCAN Vent',
         'range':[0,2000],
         'disable': False
     }

@@ -68,7 +68,7 @@ class App:
                                nticks=4
                                ),
                         
-                    #  autosize=True,
+                    autosize=True,
                     #  height=200,
                     #  width=400,
                     # l r b t control the gap between the edge of the plot-container and the plot itself
@@ -169,7 +169,7 @@ def build_pressure_mass_section(data):
 
 def build_voltages_section(data):
     # I walked onto the google campus and just ooh im wet splooshin everywhere
-    return table_section_generator('Voltages',
+    return table_section_generator('Battery Voltages',
                                    'voltages-section',
                                    data.voltages,
                                    ['Name', 'Value'],

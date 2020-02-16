@@ -84,9 +84,7 @@ div.bot-row {
         flex-basis: 0; }
         div.bot-row div.section div.section-plots div.graph-container .dash-graph {
           width: 100%;
-          height: 150px;
-          flex-grow: 1;
-          flex-shrink: 1; }
+          height: 150px; }
 
 div#valves-table {
   width: 250px; }
@@ -97,7 +95,7 @@ div#voltages-table {
 div.table-main {
   display: flex;
   flex-flow: row nowrap;
-  color: #30333d;
+  color: #717378;
   margin: 10px -10px 0 -10px;
   justify-content: stretch;
   flex-grow: 1;
@@ -113,8 +111,7 @@ div.table-main {
       margin-bottom: 10px; }
     div.table-main div.table-column .table-item-leftmost {
       color: #b2b2b2;
-      text-align: right;
-      width: max-content; }
+      text-align: right; }
     div.table-main div.table-column .table-item {
       margin-bottom: auto; }
     div.table-main div.table-column .table-item-fixed-width {
