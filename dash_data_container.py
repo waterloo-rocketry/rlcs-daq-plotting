@@ -6,14 +6,14 @@ from plotly import graph_objs as go
 from dash.dependencies import Output
 from collections import deque
 import math
-from settings import settings
+from settings import Settings
 import numpy as np
 
 # Calculate how many items to keep per plot using the plot domain and arduino refresh rate
-MAX_LEN = int((settings['range'][1]-settings['range'][0])*settings['arduino_hz'])
 
 class DashData:
     def __init__(self):
+        self.settings = Settings()
         self.plots_currents = self.generate_component_objects(IgnitionCurrentPlot, current_plots)
         self.plots_pressure_mass = self.generate_component_objects(PressureMassPlot, pressure_mass_plots)
         self.plots = self.plots_pressure_mass + self.plots_currents
@@ -40,11 +40,11 @@ class DashData:
 
 class DashComponent:
     def __init__(self, data_dict):
-        #  print(data_dict)
+        self.settings = Settings()
         self.id = data_dict['id']
         self.title = data_dict['title']
         self.range = data_dict['range']
-        self.data = {'X': deque(maxlen=MAX_LEN),'Y': deque(maxlen=MAX_LEN)}
+        self.data = {'X': deque(maxlen=self.settings.max_len),'Y': deque(maxlen=self.settings.max_len)}
 
     # Entirely for testing, this just generates values in interesting patterns
     def generate_next_test_value(self):
@@ -98,14 +98,23 @@ class Plot(DashComponent):
     def __init__(self, plot_dict):
         super().__init__(plot_dict)
         self.dash_object_type = go.Scatter
+        self.zero = 0
 
     def update(self, val, timestamp):
         self.data['Y'].append(int(val))
         self.data['X'].append(timestamp)
-        #  print(f'data: {self.data}')
 
-    def get_mapped_output(self):
+    def update_zero(self, zero):
+        self.zero = 0 if not zero else float(zero)
+
+    #  def get_mapped_output(self):
+        #  return [Output(self.id, 'figure'), Output(f'val-{self.id}', 'chidren')]
+
+    def get_fig_output(self):
         return Output(self.id, 'figure')
+    
+    def get_val_output(self):
+        return [Output(f'val-{self.id}', 'children'), Output(f'adj-{self.id}', 'children')]
 
 class PressureMassPlot(Plot):
     def __init__(self, plot_dict):
@@ -114,10 +123,21 @@ class PressureMassPlot(Plot):
     
     def get_y_list(self):
         y_list = []
+        #  print(self.zero)
         for i in self.data['Y']:
-            y_list.append(i)
+            y_list.append(i-self.zero)
+        if not y_list:
+            y_list.append(self.settings.data_missing_value)
         return y_list
-
+    
+    def get_cur_val(self):
+        if self.data['Y']:
+            cur=self.data['Y'][-1]
+            cur_adj = cur - self.zero
+        else:
+            cur = self.settings.data_missing_value
+            cur_adj = self.settings.data_missing_value
+        return {'val':cur, 'adj': cur_adj}
 
 class IgnitionCurrentPlot(Plot):
     def __init__(self, plot_dict):
@@ -128,7 +148,18 @@ class IgnitionCurrentPlot(Plot):
         y_list = []
         mA_per_A = 1000.0
         for i in self.data['Y']:
-            y_list.append(i/mA_per_A)
-        #  print(y_list)
+            y_list.append(i/mA_per_A - self.zero)
+        if not y_list:
+            y_list.append(self.settings.data_missing_value)
         return y_list
+    
+    def get_cur_val(self):
+        mA_per_A = 1000.0
+        if self.data['Y']:
+            cur=self.data['Y'][-1]/mA_per_A
+            cur_adj = cur - self.zero
+        else:
+            cur = self.settings.data_missing_value
+            cur_adj = self.settings.data_missing_value
+        return {'val':cur, 'adj': cur_adj}
 

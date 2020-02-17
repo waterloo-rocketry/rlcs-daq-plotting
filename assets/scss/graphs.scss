@@ -132,6 +132,28 @@ div#valves-table{
 div#voltages-table{
   width: 250px;
 }
+
+div.plot-footer{
+  display:flex;
+  flex-flow: row nowrap;
+
+  div.plot-footer-subsection{
+    display: flex;
+    flex-flow: row nowrap;
+    font:{
+      size: $fontsize-tableitem;
+    }
+
+    p.plot-footer-label{
+      color: $subtlegrey;
+      text-align: right;
+    }
+
+    .plot-footer-value{
+      color: mix($subtlegrey, $mediumgrey, 90%);
+    }
+  }
+}
     
 div.table-main{
   display: flex;

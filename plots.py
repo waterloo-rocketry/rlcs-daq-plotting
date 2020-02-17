@@ -17,8 +17,6 @@ class Connection_State(LabledEnum):
     UNKNOWN = (3, "Unknown")
     DAQ_VALVE_ILLEGAL = (4, "Illegal")
 
-MAX_LEN = 200 # max number of data points stored and displayed
-
 
 '''
 GRAPH CATEGORIES

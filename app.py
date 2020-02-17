@@ -9,7 +9,7 @@ from plots import Connection_State
 import argparse
 
 from utils import format_x, flatten
-from settings import settings
+from settings import Settings
 
 
 subtle_grey = '#b2b2b2'
@@ -17,7 +17,7 @@ plotbg_grey = '#212738'
 
 class App:
     def __init__(self, testing):
-        self.settings = settings
+        self.settings = Settings()
         self.arduino = Arduino(testing)
         self.arduino.start()
         self.data = self.arduino.data
@@ -30,27 +30,35 @@ class App:
             build_bot_row(self.data),
             dcc.Interval(
                 id='graph-update',
-                interval=(1/settings['dashboard_hz'])*1000
+                interval=(1/self.settings.dashboard_hz)*1000
             )
         ], className="main")
+        
+        #  @self.app.callback([],
+                           #  [Input('graph-update', 'n_intervals')]+
+                           #  [Input(f'zero-{plot.id}', 'value') for plot in self.data.plots])
+        #  def update_plot_zeros(n, *zeros):
+            #  print(self.data.plots[0].zero)
+            #  for plot, zero in zip(self.data.plots, zeros):
+                #  plot.update_zero(zero)
+                #  print(plot.zero)
 
-
-        @self.app.callback([plot.get_mapped_output() for plot in self.data.plots],
+        @self.app.callback([plot.get_fig_output() for plot in self.data.plots],
                       [Input('graph-update', 'n_intervals')])
         def update_plots(n):
             new_figs = []
             for plot in self.data.plots:
                 formatted_y = plot.get_y_list()
                 new_data = go.Scatter(
-                    x=format_x(plot.data['X'], self.settings),
+                    x=format_x(plot.data['X']),
                     y=formatted_y,
                     name='Scatter',
                     mode='lines+markers'
                 )
-                if self.settings['autorange'] and plot.data['X']:
+                if self.settings.autorange and plot.data['X']:
                     xrange = [min(plot.data['X']), max(plot.data['X'])]
                 else:
-                    xrange = self.settings['range']
+                    xrange = self.settings.domain
 
                 if formatted_y:
                     yrange = [min(formatted_y), max(formatted_y)]
@@ -59,8 +67,8 @@ class App:
 
                 new_layout = go.Layout(
                     xaxis=dict(range=xrange,
-                                #  tickformat='%X' if not self.settings['relative_timestamps'] else '-',
-                               showticklabels=self.settings['show_timestamps'],
+                                #  tickformat='%X' if not self.settings.relative_timestamps else '-',
+                               showticklabels=self.settings.show_timestamps,
                                #  domain=(-5,0)
                               ),
                     yaxis=dict(range=yrange,
@@ -83,9 +91,26 @@ class App:
                     plot_bgcolor = plotbg_grey,
                     paper_bgcolor = plotbg_grey
                 )
-
+                
+                # add figure to output
                 new_figs.append({'data': [new_data], 'layout': new_layout})
+                
             return new_figs
+        
+        @self.app.callback(flatten([plot.get_val_output() for plot in self.data.plots]),
+                      [Input('graph-update', 'n_intervals')]+
+                           [Input(f'zero-{plot.id}', 'value') for plot in self.data.plots])
+        def update_plot_vals(n, *zeros):
+            new_vals = []
+            #  print(zeros)
+            for plot, zero in zip(self.data.plots, zeros):
+                plot.update_zero(zero)
+                cur_vals_dict = plot.get_cur_val()
+                val = cur_vals_dict['val']
+                adj = cur_vals_dict['adj']
+                new_vals.append(val)
+                new_vals.append(adj)
+            return new_vals 
 
         @self.app.callback([voltage.get_mapped_output() for voltage in self.data.voltages],
                       [Input('graph-update', 'n_intervals')])
@@ -118,20 +143,48 @@ def section_header_generator(name):
 # Generates the plots in a section
 def section_plots_generator(plots, className='', id=''):
     section_plots = []
-    config={'displayModeBar': False}
+    settings = Settings()
+    config={'displayModeBar': settings.display_mode_bar}
     for plot in plots:
-        new_plot_div = html.Div([
+        graph_container_items = [
             html.H3(plot.title, className='plot-title'),
-            dcc.Graph(id=plot.id, config=config)# if plot.graph_type'] == go.Scatter else plot['graph_type(id=name)
-        ], className="graph-container")
+            dcc.Graph(id=plot.id, config=config)
+        ]
+        if settings.show_plot_footer:
+            graph_container_items.append(generate_plot_footer(plot))
+        new_plot_div = html.Div(graph_container_items, className="graph-container")
         section_plots.append(new_plot_div)
     section_plots_div = html.Div(section_plots, className=f'section-plots {className}')
     return section_plots_div
 
+def generate_plot_footer(plot):
+    val_label = html.P('Val', className='plot-footer-label')
+    val = html.P('', id=f'val-{plot.id}', className='plot-footer-value')
+    val_div_items=[val_label, val]
+    val_div = html.Div(val_div_items, className='plot-footer-subsection')
+    
+    adj_label = html.P('Adj', className='plot-footer-label')
+    adj = html.P('', id=f'adj-{plot.id}', className='plot-footer-value')
+    adj_div_items=[adj_label, adj]
+    adj_div = html.Div(adj_div_items, className='plot-footer-subsection')
+
+    zero_label = html.P('Zero', className='plot-footer-label')
+    zero_input = dcc.Input(
+        id=f"zero-{plot.id}", type="number", className='plot-footer-value',
+        debounce=True, placeholder="0.00",
+    )
+    zero_div_items = [zero_label, zero_input]
+    zero_div = html.Div(zero_div_items, className='plot-footer-subsection')
+    outer_div_items = [val_div, adj_div, zero_div]
+    outer_div = html.Div(outer_div_items, className='plot-footer')
+    return outer_div
+
 def table_section_generator(name, id, plots, column_titles, column_className='table-column', column_title_className='column-title', item_className='table-item', leftmost_item_className='table-item-leftmost', table_className='table-main', table_id=''):
     # rows should be ["name", element_id_col1, element_id_col2, ...]
     
-    if settings['disable_table_column_titles']:
+    settings = Settings()
+    
+    if settings.disable_table_column_titles:
         items_in_first_col = []
     else:
         items_in_first_col = [html.P(column_titles[0], className=column_title_className)]
@@ -140,7 +193,7 @@ def table_section_generator(name, id, plots, column_titles, column_className='ta
         items_in_first_col.append(html.P(plot.title, className=f'{item_className} {leftmost_item_className}'))
     first_col = html.Div(items_in_first_col, className=column_className)
     
-    if settings['disable_table_column_titles']:
+    if settings.disable_table_column_titles:
 
         items_in_2nd_column = []
     else:

@@ -4,6 +4,7 @@ import dash_html_components as html
 from plotly import graph_objs as go
 import dash
 from dash.dependencies import Output, Input, State
+from settings import Settings
 
 import datetime
 
@@ -15,10 +16,11 @@ class LabledEnum(Enum):
         obj.label = label
         return obj
 
-def format_x(queue, settings):
+def format_x(queue):
     output_list = []
+    settings = Settings()
     for i in list(queue):
-        if settings['relative_timestamps']:
+        if settings.relative_timestamps:
             delta = i - datetime.datetime.now()
             output_list.append(delta.total_seconds())
         else:
@@ -26,10 +28,12 @@ def format_x(queue, settings):
     #  print(output_list)
     return output_list
 
-def flatten(listy_boi, final=[]):
+def flatten(listy_boi):
+    out = []
     for i in listy_boi:
-        if isinstance(i,list):
-            flatten(i, final)
+        if isinstance(i, list):
+            for j in i:
+                out.append(j)
         else:
-            final.append(i)
-    return final
+            out.append(i)
+    return out

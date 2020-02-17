@@ -5,7 +5,7 @@ from enum import Enum
 import threading
 import time
 import datetime
-from settings import settings
+from settings import Settings
 
 from dash_data_container import DashData
 
@@ -21,6 +21,7 @@ class Arduino(threading.Thread):
     def __init__(self, testing, port='/dev/ttyACM0'):
         super().__init__()
         self.testing = testing
+        self.settings = Settings()
         if not testing:
             self.device = serial.Serial(port, baudrate=9600, timeout=5, write_timeout=3)
             self.connect()
@@ -64,7 +65,7 @@ class Arduino(threading.Thread):
                 for component_id, component_obj in self.data.mappings.items():
                     next_val = component_obj.generate_next_test_value()
                     self.decode_assign(f'{component_id}={next_val}')
-                    time.sleep(1/settings['arduino_hz'])
+                    time.sleep(1/self.settings.arduino_hz)
     
     def serial_out(self, string):
         string += "\n"
