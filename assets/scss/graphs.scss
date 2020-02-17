@@ -2,13 +2,19 @@ $pad: 10px;
 $font-family: "Open Sans", sans-serif;
 $bgcolor-main: #1e2130;
 // $bgcolor-lighter: lighten($bgcolor-main, 10%);
-$bgcolor-darker: #161a28;
-$fontcolor-title-offwhite: #f3f5f4;
+$darkest-blue: #161a28;
+$offwhite: #f3f5f4;
 $fontsize-sectionheader: 19px;
 $fontsize-plottitle: 13px;
-$subtlegrey: #b2b2b2;
+$lightgrey: #b2b2b2;
 $mediumgrey: #30333d;
 $fontsize-tableitem: 14px;
+$fontsize-plot-footer: 14px;
+
+$main-title-height: 40px;
+$plot-title-height: 26px;
+
+$graph-height: 22vh;
 
 *{
   box-sizing: border-box;
@@ -26,6 +32,7 @@ div.main{
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
+  align-content: stretch;
   overflow: hidden;
 }
 
@@ -38,12 +45,14 @@ div.top-row{ // the top half, containing (currently) only pressure and mass sect
   background-color: yellow;
   margin: $pad 0;
   flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0;
 
   div#pressure-mass-section{
     display: flex;
     flex-flow: column nowrap;
     flex-grow: 1;
-    background-color: $bgcolor-darker;
+    background-color: $darkest-blue;
     padding: $pad;
     margin: 0;
 
@@ -64,11 +73,10 @@ div.top-row{ // the top half, containing (currently) only pressure and mass sect
         .dash-graph{
           background-color: red;
           width: 100%;
-          // flex-grow: 1;
-          // flex-shrink: 0;
           // flex-basis: 200px;
           // min-width: 200px;
-          height: 200px;
+          // height: 150px;
+          height: $graph-height;
         }
       }
     }
@@ -78,11 +86,13 @@ div.top-row{ // the top half, containing (currently) only pressure and mass sect
 div.bot-row{
   display: flex;
   flex-flow: row nowrap;
-  margin: $pad 0-$pad;
+  margin: $pad 0-$pad auto 0-$pad;
   justify-content: stretch;
   align-items: stretch;
   background-color: transparent;
   flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0;
 
   div#ignition-currents-section{
     // flex-grow: 2;
@@ -95,7 +105,7 @@ div.bot-row{
     flex-shrink: 1;
     flex-basis: auto;
     align-items: stretch;
-    background-color: $bgcolor-darker;
+    background-color: $darkest-blue;
     padding: $pad;
     margin: 0 $pad;
 
@@ -118,7 +128,7 @@ div.bot-row{
 
         .dash-graph{
           width: 100%;
-          height: 150px;
+          height: $graph-height;
         }
       }
     }
@@ -136,21 +146,46 @@ div#voltages-table{
 div.plot-footer{
   display:flex;
   flex-flow: row nowrap;
+  justify-content: space-between;
+  margin: $pad 0-$pad/2 0 0;
+  padding: 0;
+  font-weight: 100;
 
   div.plot-footer-subsection{
     display: flex;
     flex-flow: row nowrap;
     font:{
-      size: $fontsize-tableitem;
+      size: $fontsize-plot-footer;
+    }
+    background-color: $bgcolor-main;
+    margin: 0 $pad/2 0 0;
+
+    p.plot-footer-label, p.plot-footer-value, input.plot-footer-value{
+      flex-grow: 1;
+      flex-shrink: 1;
+      flex-basis: 0;
+      padding: $pad/2;
+      margin: 0 0 0 0;
+      background-color: transparent;
+      font: {
+        family: $font-family;
+        size: $fontsize-plot-footer;
+      }
+      border: none;
     }
 
     p.plot-footer-label{
-      color: $subtlegrey;
+      color: $lightgrey;
       text-align: right;
     }
 
-    .plot-footer-value{
-      color: mix($subtlegrey, $mediumgrey, 90%);
+    p.plot-footer-value{
+      color: mix($lightgrey, $offwhite, 0%);
+    }
+
+    input.plot-footer-value{
+      width: 40px;
+      color: mix($lightgrey, $offwhite, 0%);
     }
   }
 }
@@ -158,7 +193,7 @@ div.plot-footer{
 div.table-main{
   display: flex;
   flex-flow: row nowrap;
-  color: mix($subtlegrey, $mediumgrey, 50%);
+  color: mix($lightgrey, $mediumgrey, 50%);
   margin: $pad 0-$pad 0 0-$pad;
   justify-content: stretch;
   flex-grow: 1;
@@ -176,7 +211,7 @@ div.table-main{
       font: {
         size: $fontsize-tableitem + 2px;
       }
-      color: mix($subtlegrey, $mediumgrey, 90%);
+      color: mix($lightgrey, $mediumgrey, 90%);
       margin-bottom: $pad;
     }
 
@@ -184,8 +219,8 @@ div.table-main{
       // flex-grow: 1;
       // flex-shrink: 1;
       // flex-basis: 0;
-      // color: mix($subtlegrey, $mediumgrey, 85%);
-      color: $subtlegrey;
+      // color: mix($lightgrey, $mediumgrey, 85%);
+      color: $lightgrey;
       text-align: right;
     }
     
@@ -241,12 +276,13 @@ h1#main-title{ //main title
   margin: 0;
   font-family: $font-family;
   font-weight: 300;
-  color: $fontcolor-title-offwhite;
+  color: $offwhite;
+  height: $main-title-height;
 }
 
 .section-header{
   margin: 0;
-  color: $fontcolor-title-offwhite;
+  color: $offwhite;
   font: {
     family: $font-family;
     weight: 300;
@@ -257,7 +293,7 @@ h1#main-title{ //main title
 .plot-title{
   margin: 0;
   padding: $pad/2 0;
-  color: $fontcolor-title-offwhite;
+  color: $offwhite;
   font: {
     weight: 300;
     family: $font-family;
@@ -265,8 +301,23 @@ h1#main-title{ //main title
   }
   text-align: center;
   background: $mediumgrey;
+  height: $plot-title-height;
 }
 
 .dash-debug-menu{
   top: 10px;
+}
+
+
+// Hiding the arrows on number input
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance:textfield;
 }

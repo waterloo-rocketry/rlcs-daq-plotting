@@ -157,7 +157,9 @@ class IgnitionCurrentPlot(Plot):
         mA_per_A = 1000.0
         if self.data['Y']:
             cur=self.data['Y'][-1]/mA_per_A
-            cur_adj = cur - self.zero
+            cur_adj = cur-self.zero
+            cur_adj = f'{(cur-self.zero):.2f}'
+            cur=f'{cur:.2f}'
         else:
             cur = self.settings.data_missing_value
             cur_adj = self.settings.data_missing_value

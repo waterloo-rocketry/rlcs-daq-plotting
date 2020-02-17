@@ -4,7 +4,7 @@ class Settings:
     relative_timestamps= True
     autorange= False
     domain = [-40, 0] # technically its the domain (x axis of the plots
-    dashboard_hz= 1
+    dashboard_hz= 0.1
     arduino_hz= 5
     disable_table_column_titles= True
     show_plot_footer= True

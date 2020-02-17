@@ -16,6 +16,7 @@ div.main {
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
+  align-content: stretch;
   overflow: hidden; }
 
 div.top-row {
@@ -25,7 +26,9 @@ div.top-row {
   align-items: stretch;
   background-color: yellow;
   margin: 10px 0;
-  flex-grow: 1; }
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0; }
   div.top-row div#pressure-mass-section {
     display: flex;
     flex-flow: column nowrap;
@@ -47,16 +50,18 @@ div.top-row {
         div.top-row div#pressure-mass-section div.section-plots div.graph-container .dash-graph {
           background-color: red;
           width: 100%;
-          height: 200px; }
+          height: 22vh; }
 
 div.bot-row {
   display: flex;
   flex-flow: row nowrap;
-  margin: 10px -10px;
+  margin: 10px -10px auto -10px;
   justify-content: stretch;
   align-items: stretch;
   background-color: transparent;
-  flex-grow: 1; }
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0; }
   div.bot-row div.section {
     display: flex;
     flex-flow: column nowrap;
@@ -84,7 +89,7 @@ div.bot-row {
         flex-basis: 0; }
         div.bot-row div.section div.section-plots div.graph-container .dash-graph {
           width: 100%;
-          height: 150px; }
+          height: 22vh; }
 
 div#valves-table {
   width: 250px; }
@@ -94,16 +99,35 @@ div#voltages-table {
 
 div.plot-footer {
   display: flex;
-  flex-flow: row nowrap; }
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  margin: 10px -5px 0 0;
+  padding: 0;
+  font-weight: 100; }
   div.plot-footer div.plot-footer-subsection {
     display: flex;
     flex-flow: row nowrap;
-    font-size: 14px; }
+    font-size: 14px;
+    background-color: #1e2130;
+    margin: 0 5px 0 0; }
+    div.plot-footer div.plot-footer-subsection p.plot-footer-label, div.plot-footer div.plot-footer-subsection p.plot-footer-value, div.plot-footer div.plot-footer-subsection input.plot-footer-value {
+      flex-grow: 1;
+      flex-shrink: 1;
+      flex-basis: 0;
+      padding: 5px;
+      margin: 0 0 0 0;
+      background-color: transparent;
+      font-family: "Open Sans", sans-serif;
+      font-size: 14px;
+      border: none; }
     div.plot-footer div.plot-footer-subsection p.plot-footer-label {
       color: #b2b2b2;
       text-align: right; }
-    div.plot-footer div.plot-footer-subsection .plot-footer-value {
-      color: #a5a5a6; }
+    div.plot-footer div.plot-footer-subsection p.plot-footer-value {
+      color: #f3f5f4; }
+    div.plot-footer div.plot-footer-subsection input.plot-footer-value {
+      width: 40px;
+      color: #f3f5f4; }
 
 div.table-main {
   display: flex;
@@ -166,7 +190,8 @@ h1#main-title {
   margin: 0;
   font-family: "Open Sans", sans-serif;
   font-weight: 300;
-  color: #f3f5f4; }
+  color: #f3f5f4;
+  height: 40px; }
 
 .section-header {
   margin: 0;
@@ -183,9 +208,20 @@ h1#main-title {
   font-family: "Open Sans", sans-serif;
   font-size: 13px;
   text-align: center;
-  background: #30333d; }
+  background: #30333d;
+  height: 26px; }
 
 .dash-debug-menu {
   top: 10px; }
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0; }
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield; }
 
 /*# sourceMappingURL=graphs.css.map */

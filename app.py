@@ -76,7 +76,7 @@ class App:
                                nticks=4
                                ),
                         
-                    autosize=True,
+                    #  autosize=True,
                     #  height=200,
                     #  width=400,
                     # l r b t control the gap between the edge of the plot-container and the plot itself
@@ -158,12 +158,12 @@ def section_plots_generator(plots, className='', id=''):
     return section_plots_div
 
 def generate_plot_footer(plot):
-    val_label = html.P('Val', className='plot-footer-label')
+    val_label = html.P('Value', className='plot-footer-label')
     val = html.P('', id=f'val-{plot.id}', className='plot-footer-value')
     val_div_items=[val_label, val]
     val_div = html.Div(val_div_items, className='plot-footer-subsection')
     
-    adj_label = html.P('Adj', className='plot-footer-label')
+    adj_label = html.P('Adj.', className='plot-footer-label')
     adj = html.P('', id=f'adj-{plot.id}', className='plot-footer-value')
     adj_div_items=[adj_label, adj]
     adj_div = html.Div(adj_div_items, className='plot-footer-subsection')
@@ -171,7 +171,7 @@ def generate_plot_footer(plot):
     zero_label = html.P('Zero', className='plot-footer-label')
     zero_input = dcc.Input(
         id=f"zero-{plot.id}", type="number", className='plot-footer-value',
-        debounce=True, placeholder="0.00",
+        debounce=True, placeholder="0",
     )
     zero_div_items = [zero_label, zero_input]
     zero_div = html.Div(zero_div_items, className='plot-footer-subsection')
