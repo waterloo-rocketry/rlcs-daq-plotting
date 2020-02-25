@@ -65,7 +65,7 @@ class Arduino(threading.Thread):
                 for component_id, component_obj in self.data.mappings.items():
                     next_val = component_obj.generate_next_test_value()
                     self.decode_assign(f'{component_id}={next_val}')
-                    time.sleep(1/self.settings.arduino_hz)
+                time.sleep(1/self.settings.arduino_hz)
     
     def serial_out(self, string):
         string += "\n"
