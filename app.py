@@ -50,15 +50,7 @@ class App:
         def update_plots(n):
             new_figs = []
 
-            temp_delete = 1
             for plot in self.data.plots:
-                if temp_delete == 1:
-                    print('X')
-                    print(plot.data['X'])
-                    print('Y')
-                    print(plot.data['Y'])
-                    print()
-                    temp_delete += 1
                 formatted_y = plot.get_y_list()
                 new_data = go.Scatter(
                     x=format_x(plot.data['X']),
@@ -67,7 +59,6 @@ class App:
                     mode='lines+markers'
                 )
                 if self.settings.autorange and plot.data['X']:
-                    print('xrange using min/max')
                     xrange = [min(plot.data['X']), max(plot.data['X'])]
                 elif self.settings.relative_timestamps:
                     xrange = self.settings.domain
