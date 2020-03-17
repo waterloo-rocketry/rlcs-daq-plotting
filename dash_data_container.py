@@ -56,7 +56,6 @@ class DashComponent:
         delta = random.randint(-range_breadth, range_breadth)
         new = self.data['Y'][-1] + delta
         out = np.clip(new, self.range[0], self.range[1])
-        #  print(out)
         return out
 
 
@@ -107,14 +106,34 @@ class Plot(DashComponent):
     def update_zero(self, zero):
         self.zero = 0 if not zero else float(zero)
 
-    #  def get_mapped_output(self):
-        #  return [Output(self.id, 'figure'), Output(f'val-{self.id}', 'chidren')]
-
     def get_fig_output(self):
-        return Output(self.id, 'figure')
+        return Output(self.id, 'extendData')
     
     def get_val_output(self):
         return [Output(f'val-{self.id}', 'children'), Output(f'adj-{self.id}', 'children')]
+    
+    def extend_x_y(self):
+        new_x = []
+        new_y = []
+
+        if (self.data['X']):
+            i = len(self.data['X']) - 1
+
+            # Todo update to 3.8 so i can use sexy walrus operator
+            first = not hasattr(self, 'last_plotted_x')
+            if first:
+                self.last_plotted_x = -1 # temp
+
+            y_list_formatted = self.get_y_list()
+
+            while (i >= 0) if first else (self.last_plotted_x < self.data['X'][i]):
+                new_x.insert(0, self.data['X'][i])
+                new_y.insert(0, y_list_formatted[i])
+                i -= 1
+
+            self.last_plotted_x = self.data['X'][-1]
+
+        return new_x, new_y
 
 class PressureMassPlot(Plot):
     def __init__(self, plot_dict):
