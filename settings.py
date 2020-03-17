@@ -1,10 +1,10 @@
 
 class Settings:
     show_timestamps= True
-    relative_timestamps= True
+    relative_timestamps= False
     autorange= False
     domain = [-120, 0] # how long back in time to plot
-    dashboard_hz = 1.2
+    dashboard_hz = 3
     arduino_hz = 3
     disable_table_column_titles= True
     show_plot_footer= True

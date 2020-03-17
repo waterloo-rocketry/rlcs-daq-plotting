@@ -43,11 +43,22 @@ class App:
                 #  plot.update_zero(zero)
                 #  print(plot.zero)
 
+
+        # Update the plot data ie. x, y lists
         @self.app.callback([plot.get_fig_output() for plot in self.data.plots],
                       [Input('graph-update', 'n_intervals')])
         def update_plots(n):
             new_figs = []
+
+            temp_delete = 1
             for plot in self.data.plots:
+                if temp_delete == 1:
+                    print('X')
+                    print(plot.data['X'])
+                    print('Y')
+                    print(plot.data['Y'])
+                    print()
+                    temp_delete += 1
                 formatted_y = plot.get_y_list()
                 new_data = go.Scatter(
                     x=format_x(plot.data['X']),
@@ -56,9 +67,12 @@ class App:
                     mode='lines+markers'
                 )
                 if self.settings.autorange and plot.data['X']:
+                    print('xrange using min/max')
                     xrange = [min(plot.data['X']), max(plot.data['X'])]
-                else:
+                elif self.settings.relative_timestamps:
                     xrange = self.settings.domain
+                else: # temp delete this!!!!
+                    xrange = [min(plot.data['X']), max(plot.data['X'])]
 
                 if formatted_y:
                     yrange = [min(formatted_y), max(formatted_y)]
@@ -67,9 +81,8 @@ class App:
 
                 new_layout = go.Layout(
                     xaxis=dict(range=xrange,
-                                #  tickformat='%X' if not self.settings.relative_timestamps else '-',
+                               tickformat='%X' if not self.settings.relative_timestamps else '-',
                                showticklabels=self.settings.show_timestamps,
-                               #  domain=(-5,0)
                               ),
                     yaxis=dict(range=yrange,
                                tickfont=dict(family='Open Sans', color=f'{subtle_grey}', size=10),
@@ -97,6 +110,7 @@ class App:
                 
             return new_figs
         
+        # Update the val field shown below each plot
         @self.app.callback(flatten([plot.get_val_output() for plot in self.data.plots]),
                       [Input('graph-update', 'n_intervals')]+
                            [Input(f'zero-{plot.id}', 'value') for plot in self.data.plots])
@@ -148,7 +162,30 @@ def section_plots_generator(plots, className='', id=''):
     for plot in plots:
         graph_container_items = [
             html.H3(plot.title, className='plot-title'),
-            dcc.Graph(id=plot.id, config=config)
+            dcc.Graph(id=plot.id, config=config, figure={
+                'data': [{'X':[], 'Y':[]}],
+                'layout': go.Layout(
+                    xaxis=dict(range=xrange,
+                               tickformat='%X' if not self.settings.relative_timestamps else '-',
+                               showticklabels=self.settings.show_timestamps,
+                              ),
+                    yaxis=dict(range=yrange,
+                               tickfont=dict(family='Open Sans', color=f'{subtle_grey}', size=10),
+                               nticks=4
+                               ),
+                        
+                    # l r b t control the gap between the edge of the plot-container and the plot itself
+                    margin={
+                        'l': 40,
+                        'r': 30,
+                        'b': 30,
+                        't': 5,
+                        'pad': 0
+                    },
+                    plot_bgcolor = plotbg_grey,
+                    paper_bgcolor = plotbg_grey
+                )
+            )
         ]
         if settings.show_plot_footer:
             graph_container_items.append(generate_plot_footer(plot))
