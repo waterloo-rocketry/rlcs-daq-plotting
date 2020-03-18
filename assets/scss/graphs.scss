@@ -160,33 +160,53 @@ div.plot-footer{
     background-color: $bgcolor-main;
     margin: 0 $pad/2 0 0;
 
-    p.plot-footer-label, p.plot-footer-value, input.plot-footer-value{
+    p.plot-footer-label, .plot-footer-value{
       flex-grow: 1;
       flex-shrink: 1;
       flex-basis: 0;
       padding: $pad/2;
       margin: 0 0 0 0;
       background-color: transparent;
+      border: none;
       font: {
         family: $font-family;
-        size: $fontsize-plot-footer;
       }
-      border: none;
     }
-
+    
     p.plot-footer-label{
       color: $lightgrey;
       text-align: right;
+      font: {
+        size: $fontsize-plot-footer;
+      }
+    }
+    
+    p.plot-footer-label.adj{
+      color: $offwhite;
+      font:{
+        weight: bold;
+      }
     }
 
-    p.plot-footer-value{
+    .plot-footer-value{
       color: mix($lightgrey, $offwhite, 0%);
     }
 
     input.plot-footer-value{
       width: 40px;
-      color: mix($lightgrey, $offwhite, 0%);
     }
+
+    .plot-footer-value.adj{
+      font: {
+        size: $fontsize-plot-footer;
+        weight: bold;
+      }
+      color: $offwhite;
+    }
+  }
+  div.plot-footer-subsection.adj{
+    background: $mediumgrey;
+    flex-basis: 33%;
   }
 }
     
