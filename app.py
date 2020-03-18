@@ -40,6 +40,7 @@ class App:
                       [Input('graph-update', 'n_intervals')])
         def update_plots(n):
             new_figs = []
+            i=0
             for plot in self.data.plots:
                 x,y=plot.extend_x_y()
                 x=format_x(x)
@@ -47,8 +48,8 @@ class App:
                 new_data = (dict(
                     x=[x],
                     y=[y]
-                ), [0])
-
+                ), [0], self.settings.max_len)
+                
                 new_figs.append(new_data)
             return new_figs
         
@@ -111,7 +112,7 @@ def section_plots_generator(plots, className='', id=''):
                 'data': [{'x':[], 'y':[]}],
                 'layout': go.Layout(
                     xaxis=dict(#range=xrange,
-                               tickformat='%X' if not settings.relative_timestamps else '-',
+                               tickformat='%X.%f' if not settings.relative_timestamps else '-',
                                showticklabels=settings.show_timestamps,
                               ),
                     yaxis=dict(#range=yrange,
