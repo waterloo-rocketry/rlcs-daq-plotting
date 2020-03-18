@@ -117,19 +117,22 @@ class Plot(DashComponent):
         new_y = []
 
         if (self.data['X']):
-            i = len(self.data['X']) - 1
-
-            # Todo update to 3.8 so i can use sexy walrus operator
             first = not hasattr(self, 'last_plotted_x')
             if first:
                 self.last_plotted_x = -1 # temp
 
+            i = len(self.data['X']) - 1
             y_list_formatted = self.get_y_list()
 
-            while (i >= 0) if first else (self.last_plotted_x < self.data['X'][i]):
-                new_x.insert(0, self.data['X'][i])
-                new_y.insert(0, y_list_formatted[i])
-                i -= 1
+            try:
+                while (i >= 0) if first else (self.last_plotted_x < self.data['X'][i]):
+                    new_x.insert(0, self.data['X'][i])
+                    new_y.insert(0, y_list_formatted[i])
+                    i -= 1
+            except Exception as e:
+                print(e)
+                print(i)
+                print(len(self.data['X']))
 
             self.last_plotted_x = self.data['X'][-1]
 
