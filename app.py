@@ -114,6 +114,7 @@ def section_plots_generator(plots, className='', id=''):
                     xaxis=dict(#range=xrange,
                                tickformat='%X.%f' if not settings.relative_timestamps else '-',
                                showticklabels=settings.show_timestamps,
+                               nticks=3
                               ),
                     yaxis=dict(#range=yrange,
                                tickfont=dict(family='Open Sans', color=f'{subtle_grey}', size=10),
@@ -141,15 +142,15 @@ def section_plots_generator(plots, className='', id=''):
     return section_plots_div
 
 def generate_plot_footer(plot):
-    val_label = html.P('Value', className='plot-footer-label')
+    val_label = html.P('Raw', className='plot-footer-label')
     val = html.P('', id=f'val-{plot.id}', className='plot-footer-value')
     val_div_items=[val_label, val]
     val_div = html.Div(val_div_items, className='plot-footer-subsection')
     
-    adj_label = html.P('Adj.', className='plot-footer-label')
-    adj = html.P('', id=f'adj-{plot.id}', className='plot-footer-value')
+    adj_label = html.P('Adj.', className='plot-footer-label adj')
+    adj = html.P('', id=f'adj-{plot.id}', className='plot-footer-value adj')
     adj_div_items=[adj_label, adj]
-    adj_div = html.Div(adj_div_items, className='plot-footer-subsection')
+    adj_div = html.Div(adj_div_items, className='plot-footer-subsection adj')
 
     zero_label = html.P('Zero', className='plot-footer-label')
     zero_input = dcc.Input(

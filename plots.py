@@ -60,21 +60,21 @@ Settings ideas:
 pressure_mass_plots = [
     {
         'id': 'pressure1',
-        'title': 'Fill Tank Pressure',
+        'title': 'Fill Tank Pressure (psi)',
         'range':[0,999],
         'zero': None,
         'disable': False
     },
     {
         'id': 'pressure2',
-        'title': 'Fill Line Pressure',
+        'title': 'Fill Line Pressure (psi)',
         'range':[0,999],
         'zero': None,
         'disable': False
     },
     {
         'id': 'pressure3',
-        'title': 'Rocket Tank Pressure',
+        'title': 'Rocket Tank Pressure (psi)',
         'range':[0,999],
         'zero': None,
         'disable': False
@@ -91,14 +91,14 @@ pressure_mass_plots = [
 current_plots = [
     {
         'id': 'ign_pri_current',
-        'title': 'Ignition Primary Current',
+        'title': 'Ignition Primary Current (A)',
         'range':[0,2000],
         'zero': None,
         'disable': False
     },
     {
         'id': 'ign_sec_current',
-        'title': 'Ignition Secondary Current',
+        'title': 'Ignition Secondary Current (A)',
         'range':[0,2000],
         'zero': None,
         'disable': False
@@ -139,25 +139,25 @@ valve_states = [
 voltages = [
     {
         'id': 'rlcs_main_batt_mv',
-        'title': 'RLCS Tower Main',
+        'title': 'RLCS Tower Main (mv)',
         'range':[0,2000],
         'disable': False
     },
     {
         'id': 'rlcs_actuator_batt_mv',
-        'title': 'RLCS Tower Actuator',
+        'title': 'RLCS Tower Actuator (mv)',
         'range':[0,2000],
         'disable': False
     },
     {
         'id': 'bus_batt_mv',
-        'title': 'RocketCAN Bus',
+        'title': 'RocketCAN Bus (mv)',
         'range':[0,2000],
         'disable': False
     },
     {
         'id': 'vent_batt_mv',
-        'title': 'RocketCAN Vent',
+        'title': 'RocketCAN Vent (mv)',
         'range':[0,2000],
         'disable': False
     }

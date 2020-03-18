@@ -110,24 +110,33 @@ div.plot-footer {
     font-size: 14px;
     background-color: #1e2130;
     margin: 0 5px 0 0; }
-    div.plot-footer div.plot-footer-subsection p.plot-footer-label, div.plot-footer div.plot-footer-subsection p.plot-footer-value, div.plot-footer div.plot-footer-subsection input.plot-footer-value {
+    div.plot-footer div.plot-footer-subsection p.plot-footer-label, div.plot-footer div.plot-footer-subsection .plot-footer-value {
       flex-grow: 1;
       flex-shrink: 1;
       flex-basis: 0;
       padding: 5px;
       margin: 0 0 0 0;
       background-color: transparent;
-      font-family: "Open Sans", sans-serif;
-      font-size: 14px;
-      border: none; }
+      border: none;
+      font-family: "Open Sans", sans-serif; }
     div.plot-footer div.plot-footer-subsection p.plot-footer-label {
       color: #b2b2b2;
-      text-align: right; }
-    div.plot-footer div.plot-footer-subsection p.plot-footer-value {
+      text-align: right;
+      font-size: 14px; }
+    div.plot-footer div.plot-footer-subsection p.plot-footer-label.adj {
+      color: #f3f5f4;
+      font-weight: bold; }
+    div.plot-footer div.plot-footer-subsection .plot-footer-value {
       color: #f3f5f4; }
     div.plot-footer div.plot-footer-subsection input.plot-footer-value {
-      width: 40px;
+      width: 40px; }
+    div.plot-footer div.plot-footer-subsection .plot-footer-value.adj {
+      font-size: 14px;
+      font-weight: bold;
       color: #f3f5f4; }
+  div.plot-footer div.plot-footer-subsection.adj {
+    background: #30333d;
+    flex-basis: 33%; }
 
 div.table-main {
   display: flex;
