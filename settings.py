@@ -1,11 +1,11 @@
 
 class Settings:
     show_timestamps= True
-    relative_timestamps= True
+    relative_timestamps= False
     autorange= False
-    domain = [-120, 0] # how long back in time to plot
-    dashboard_hz = 1.2
-    arduino_hz = 3
+    domain = [-15, 0] # how long back in time to plot
+    dashboard_hz = 0.5
+    arduino_hz = 5
     disable_table_column_titles= True
     show_plot_footer= True
     data_missing_value= -999 # use this value to show that there is no data for a variable

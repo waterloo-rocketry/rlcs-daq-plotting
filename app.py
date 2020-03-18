@@ -7,6 +7,7 @@ from plotly import graph_objs as go
 from arduino_interface import Arduino
 from plots import Connection_State
 import argparse
+import datetime
 
 from utils import format_x, flatten
 from settings import Settings
@@ -34,75 +35,30 @@ class App:
             )
         ], className="main")
         
-        #  @self.app.callback([],
-                           #  [Input('graph-update', 'n_intervals')]+
-                           #  [Input(f'zero-{plot.id}', 'value') for plot in self.data.plots])
-        #  def update_plot_zeros(n, *zeros):
-            #  print(self.data.plots[0].zero)
-            #  for plot, zero in zip(self.data.plots, zeros):
-                #  plot.update_zero(zero)
-                #  print(plot.zero)
-
+        # Update the plot data ie. x, y lists
         @self.app.callback([plot.get_fig_output() for plot in self.data.plots],
                       [Input('graph-update', 'n_intervals')])
         def update_plots(n):
             new_figs = []
+            i=0
             for plot in self.data.plots:
-                formatted_y = plot.get_y_list()
-                new_data = go.Scatter(
-                    x=format_x(plot.data['X']),
-                    y=formatted_y,
-                    name='Scatter',
-                    mode='lines+markers'
-                )
-                if self.settings.autorange and plot.data['X']:
-                    xrange = [min(plot.data['X']), max(plot.data['X'])]
-                else:
-                    xrange = self.settings.domain
+                x,y=plot.extend_x_y()
+                x=format_x(x)
 
-                if formatted_y:
-                    yrange = [min(formatted_y), max(formatted_y)]
-                else:
-                    yrange = plot.range
-
-                new_layout = go.Layout(
-                    xaxis=dict(range=xrange,
-                                #  tickformat='%X' if not self.settings.relative_timestamps else '-',
-                               showticklabels=self.settings.show_timestamps,
-                               #  domain=(-5,0)
-                              ),
-                    yaxis=dict(range=yrange,
-                               tickfont=dict(family='Open Sans', color=f'{subtle_grey}', size=10),
-                               nticks=4
-                               ),
-                        
-                    #  autosize=True,
-                    #  height=200,
-                    #  width=400,
-                    # l r b t control the gap between the edge of the plot-container and the plot itself
-                    # margin, padding
-                    margin={
-                        'l': 40,
-                        'r': 30,
-                        'b': 30,
-                        't': 5,
-                        'pad': 0
-                    },
-                    plot_bgcolor = plotbg_grey,
-                    paper_bgcolor = plotbg_grey
-                )
+                new_data = (dict(
+                    x=[x],
+                    y=[y]
+                ), [0], self.settings.max_len)
                 
-                # add figure to output
-                new_figs.append({'data': [new_data], 'layout': new_layout})
-                
+                new_figs.append(new_data)
             return new_figs
         
+        # Update the val field shown below each plot
         @self.app.callback(flatten([plot.get_val_output() for plot in self.data.plots]),
                       [Input('graph-update', 'n_intervals')]+
                            [Input(f'zero-{plot.id}', 'value') for plot in self.data.plots])
         def update_plot_vals(n, *zeros):
             new_vals = []
-            #  print(zeros)
             for plot, zero in zip(self.data.plots, zeros):
                 plot.update_zero(zero)
                 cur_vals_dict = plot.get_cur_val()
@@ -146,9 +102,36 @@ def section_plots_generator(plots, className='', id=''):
     settings = Settings()
     config={'displayModeBar': settings.display_mode_bar}
     for plot in plots:
+        # SUPER TEMP XRANGE WHILE FIGURING OUT HOW TO AUTORANGE WITH EXTENDDATA
+        #  xrange = [datetime.datetime.now(), datetime.datetime.now()+datetime.timedelta(minutes=1)]
+        #  yrange = plot.range
+            
         graph_container_items = [
             html.H3(plot.title, className='plot-title'),
-            dcc.Graph(id=plot.id, config=config)
+            dcc.Graph(id=plot.id, config=config, figure={
+                'data': [{'x':[], 'y':[]}],
+                'layout': go.Layout(
+                    xaxis=dict(#range=xrange,
+                               tickformat='%X.%f' if not settings.relative_timestamps else '-',
+                               showticklabels=settings.show_timestamps,
+                              ),
+                    yaxis=dict(#range=yrange,
+                               tickfont=dict(family='Open Sans', color=f'{subtle_grey}', size=10),
+                               nticks=4
+                               ),
+                        
+                    # l r b t control the gap between the edge of the plot-container and the plot itself
+                    margin={
+                        'l': 40,
+                        'r': 30,
+                        'b': 30,
+                        't': 5,
+                        'pad': 0
+                    },
+                    plot_bgcolor = plotbg_grey,
+                    paper_bgcolor = plotbg_grey
+                )
+            })
         ]
         if settings.show_plot_footer:
             graph_container_items.append(generate_plot_footer(plot))

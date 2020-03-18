@@ -25,7 +25,6 @@ def format_x(queue):
             output_list.append(delta.total_seconds())
         else:
             output_list.append(i)
-    #  print(output_list)
     return output_list
 
 def flatten(listy_boi):
