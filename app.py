@@ -114,11 +114,15 @@ def section_plots_generator(plots, className='', id=''):
                     xaxis=dict(#range=xrange,
                                tickformat='%X.%f' if not settings.relative_timestamps else '-',
                                showticklabels=settings.show_timestamps,
-                               nticks=3
+                               nticks=3,
+                               gridcolor="rgb(90, 90, 110)",
+                               zerolinecolor="rgb(74, 134, 232)"
                               ),
                     yaxis=dict(#range=yrange,
                                tickfont=dict(family='Open Sans', color=f'{subtle_grey}', size=10),
-                               nticks=4
+                               nticks=4,
+                               gridcolor="rgb(90, 90, 110)",
+                               zerolinecolor="rgb(74, 134, 232)"
                                ),
                         
                     # l r b t control the gap between the edge of the plot-container and the plot itself
