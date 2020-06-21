@@ -112,7 +112,7 @@ def section_plots_generator(plots, className='', id=''):
                 'data': [{'x':[], 'y':[]}],
                 'layout': go.Layout(
                     xaxis=dict(#range=xrange,
-                               tickformat='%X.%f' if not settings.relative_timestamps else '-',
+                               tickformat='%X.%f',
                                showticklabels=settings.show_timestamps,
                                nticks=3,
                                gridcolor="rgb(90, 90, 110)",
