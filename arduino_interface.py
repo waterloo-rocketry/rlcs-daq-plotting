@@ -12,6 +12,9 @@ from dash_data_container import DashData
 # listing ports: python -m serial.tools.list_ports will print a list of available ports. It is also possible to add a regexp as first argument and the list will only include entries that matched.
 
 class Arduino(threading.Thread):
+    """ A thread that handles all interactions between the arduino and the plotting.
+        If created with testing=True, the class will generate realistic test data instead
+        of listening over serial."""
     def __init__(self, testing, port='/dev/ttyACM0'):
         super().__init__()
         self.testing = testing
@@ -20,7 +23,6 @@ class Arduino(threading.Thread):
             self.device = serial.Serial(port, baudrate=9600, timeout=5, write_timeout=3)
             self.connect()
         self.logger = logging.Logger('logger')
-
         self.data = DashData()
 
     def connect(self):
@@ -63,6 +65,7 @@ class Arduino(threading.Thread):
         string += "\n"
         self.device.write(string_.encode())
 
+# Allows testing the arduino interface by running this file directly
 if __name__ == "__main__":
     arduino = Arduino(True)
     arduino.start()

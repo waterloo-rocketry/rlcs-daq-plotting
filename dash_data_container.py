@@ -1,3 +1,5 @@
+""" Contains classes """ # TODO update
+
 from plots import pressure_mass_plots, current_plots, voltages, valve_states
 import random
 import dash
@@ -12,6 +14,7 @@ import numpy as np
 # Calculate how many items to keep per plot using the plot domain and arduino refresh rate
 
 class DashData:
+    """ Contains all the data container objects for an instance of the dashboard """
     def __init__(self):
         self.settings = Settings()
         self.plots_currents = self.generate_component_objects(IgnitionCurrentPlot, current_plots)
@@ -22,6 +25,7 @@ class DashData:
         self.generate_mappings()
 
     def generate_mappings(self):
+        """ Generate mappings between plot/figure ID and their data container object"""
         self.mappings = {}
         for i in self.plots + self.voltages + self.valve_states:
             self.mappings[i.id]=i
