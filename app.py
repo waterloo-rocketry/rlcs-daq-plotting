@@ -102,23 +102,19 @@ def section_plots_generator(plots, className='', id=''):
     settings = Settings()
     config={'displayModeBar': settings.display_mode_bar}
     for plot in plots:
-        # SUPER TEMP XRANGE WHILE FIGURING OUT HOW TO AUTORANGE WITH EXTENDDATA
-        #  xrange = [datetime.datetime.now(), datetime.datetime.now()+datetime.timedelta(minutes=1)]
-        #  yrange = plot.range
-            
         graph_container_items = [
             html.H3(plot.title, className='plot-title'),
             dcc.Graph(id=plot.id, config=config, figure={
                 'data': [{'x':[], 'y':[]}],
                 'layout': go.Layout(
-                    xaxis=dict(#range=xrange,
+                    xaxis=dict(
                                tickformat='%X.%f',
                                showticklabels=settings.show_timestamps,
                                nticks=3,
                                gridcolor="rgb(90, 90, 110)",
                                zerolinecolor="rgb(74, 134, 232)"
                               ),
-                    yaxis=dict(#range=yrange,
+                    yaxis=dict(
                                tickfont=dict(family='Open Sans', color=f'{subtle_grey}', size=10),
                                nticks=4,
                                gridcolor="rgb(90, 90, 110)",

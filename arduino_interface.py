@@ -9,13 +9,7 @@ from settings import Settings
 
 from dash_data_container import DashData
 
-# notes: 
-# super broken (from old project) but useful starting point
 # listing ports: python -m serial.tools.list_ports will print a list of available ports. It is also possible to add a regexp as first argument and the list will only include entries that matched.
-
-# see documentation https://pythonhosted.org/pyserial/pyserial_api.html#classes
-# screw with ports, id, parity, stopbits, rtscts
-# device.in_waiting and .out_waiting gives num bytes in input and output buffers
 
 class Arduino(threading.Thread):
     def __init__(self, testing, port='/dev/ttyACM0'):
@@ -33,7 +27,7 @@ class Arduino(threading.Thread):
         try:
             self.device.open()
         except serial.SerialException:
-            #  self.logger.log("Error: Failed to open serial port.", print_line=True)
+            self.logger.log("Error: Failed to open serial port.", print_line=True)
             return False
         return True
 
@@ -46,11 +40,9 @@ class Arduino(threading.Thread):
             component_id, val = string.split('=')
             timestamp = datetime.datetime.now()
             self.data.update(component_id, val, timestamp)
-            #  plot_dict['data']['Y'].append(plots[name]['type'](val))
 
-            #  plot_dict['data']['X'].append(timestamp)
         except Exception as e:
-            print(f'error: could not parse serial data:\n {string}\n{e}')
+            print(f'Error: could not parse serial data:\n {string}\n{e}')
 
 
     def run(self):
@@ -59,7 +51,7 @@ class Arduino(threading.Thread):
                 if (self.device.in_waiting):
                     line = self.device.readline().decode().rstrip('\r\n')
                     self.decode_assign(line)
-                    #  print(line)
+
         else: # testing
             while(True):
                 for component_id, component_obj in self.data.mappings.items():
@@ -74,6 +66,4 @@ class Arduino(threading.Thread):
 if __name__ == "__main__":
     arduino = Arduino(True)
     arduino.start()
-    #  print(arduino.is_alive())
     arduino.join()
-    #  print(arduino.is_alive())
