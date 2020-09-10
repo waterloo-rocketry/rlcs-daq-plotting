@@ -21,11 +21,7 @@ class Connection_State(LabledEnum):
 '''
 GRAPH CATEGORIES
 
-??
-Number of Boards on RocketCAN (num_boards_connected)
-
 Pressure and Mass
-- should def be big graphs
     Fill Tank Pressure (pressure1)
     Fill Line Pressure (pressure2)
     Rocket Tank Pressure (pressure3)
@@ -48,13 +44,8 @@ Valves
     Remote Fill Valve State (rfill_valve_state)
     Fill Arm Linear Actuator State (linac_state)
 
-Colors: UW Black and Gold
-
-Settings ideas:
--Zero pressure and mass
--Click a button and store that
--Do time as 0, t-n (seconds)
--calculate max_len using a variable for time to store
+Misc (Not currently implemented, was deemed not useful enough)
+    Number of Boards on RocketCAN (num_boards_connected)
 '''
 
 pressure_mass_plots = [
